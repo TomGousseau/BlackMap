@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* Dark only — lighter dark theme */
+:root {
+  --color-bg: #1c1c20;
+  --color-surface: #26262a;
+  --color-surface-hover: #323236;
+  --color-text: #f0f0f2;
+  --color-text-secondary: #9a9aa0;
+  --color-border: #4a4a50;
+  --color-accent: #d4b85c;
+  --color-accent-hover: #e8d48b;
+  --color-gold: #d4b85c;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #c8a84e;
+  --color-sidebar: rgba(34, 34, 38, 0.92);
+  --color-glass: rgba(34, 34, 40, 0.80);
+  --color-glass-border: rgba(255, 255, 255, 0.14);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(212, 184, 92, 0.18);
+  color-scheme: dark;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-secondary); }
+
+/* Glass effect — solid fallback so it always looks good */
+.glass {
+  background: rgba(38, 38, 44, 0.90);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-strong {
+  background: rgba(34, 34, 40, 0.93);
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #c8a84e, #d4b85c, #e8d48b, #d4b85c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-border {
+  border: 1px solid var(--color-gold);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ===== LEAFLET Z-INDEX FIX ===== */
+/* Force Leaflet below our UI (Leaflet uses z-index 400+) */
+.leaflet-container {
+  background: #1c1c20 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  z-index: 1 !important;
+}
+.leaflet-pane { z-index: 1 !important; }
+.leaflet-tile-pane { z-index: 1 !important; }
+.leaflet-overlay-pane { z-index: 2 !important; }
+.leaflet-shadow-pane { z-index: 3 !important; }
+.leaflet-marker-pane { z-index: 4 !important; }
+.leaflet-tooltip-pane { z-index: 5 !important; }
+.leaflet-popup-pane { z-index: 6 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 7 !important; }
+.leaflet-control-zoom, .leaflet-control-attribution { display: none !important; }
+
+/* Leaflet popup Apple styling */
+.leaflet-popup-content-wrapper {
+  background: #26262a !important;
+  color: #f0f0f2 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+.leaflet-popup-tip {
+  background: #26262a !important;
+  box-shadow: none !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  color: #f0f0f2 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.leaflet-popup-close-button {
+  color: #8e8e93 !important;
+  font-size: 18px !important;
+  top: 6px !important;
+  right: 8px !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #f0f0f2 !important;
+}
+
+/* Tile loading — seamless dark bg so no grey flash */
+.leaflet-tile {
+  background: #1c1c20 !important;
+  transition: opacity 0.15s ease-in-out !important;
+}
+.leaflet-tile-pane {
+  background: #1c1c20 !important;
+}
+.leaflet-fade-anim .leaflet-tile {
+  will-change: opacity !important;
+}
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  will-change: transform !important;
+  transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1) !important;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(212,184,92,0.12) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 184, 92, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(212, 184, 92, 0); }
+}
+.pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
