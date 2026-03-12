@@ -49,8 +49,18 @@ function MapEvents({ onMapClick, addingLocation }: { onMapClick?: (lat: number, 
 
 function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
+  const prevZoom = useRef(zoom);
+  
   useEffect(() => {
-    map.flyTo(center, zoom, { duration: 0.8 });
+    // Slower animation when zooming out (dezoom)
+    const isZoomingOut = zoom < prevZoom.current;
+    const duration = isZoomingOut ? 1.4 : 1.0;
+    prevZoom.current = zoom;
+    
+    map.flyTo(center, zoom, { 
+      duration,
+      easeLinearity: 0.25,
+    });
   }, [map, center, zoom]);
   return null;
 }
@@ -74,11 +84,17 @@ export function MapView({
       preferCanvas={true}
       zoomAnimation={true}
       markerZoomAnimation={true}
-      style={{ cursor: addingLocation ? "crosshair" : "grab" }}
+      minZoom={3}
+      maxBounds={[[-85, -180], [85, 180]]}
+      maxBoundsViscosity={1.0}
+      style={{ cursor: addingLocation ? "crosshair" : "grab", background: "#1a1a1d" }}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         maxZoom={19}
+        keepBuffer={6}
+        updateWhenZooming={false}
+        updateWhenIdle={true}
       />
       <ChangeView center={center} zoom={zoom} />
       <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} />

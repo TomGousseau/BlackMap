@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, TrendingUp, MapPin, Clock, Sparkles } from "lucide-react";
+import { Search, X, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { LocationData } from "@/lib/types";
 
@@ -23,12 +23,11 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
         (l) =>
           l.name.toLowerCase().includes(query.toLowerCase()) ||
           l.category?.toLowerCase().includes(query.toLowerCase())
-      )
+      ).slice(0, 5)
     : [];
 
   const showDropdown = focused && (query.trim() === "" || filtered.length > 0);
-
-  const mostViewed = [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 6);
+  const recentPlaces = [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -49,156 +48,125 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
   };
 
   return (
-    <div ref={containerRef} className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
+    <div ref={containerRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
       <form onSubmit={handleSubmit}>
         <div
-          className="relative glass-strong rounded-full overflow-visible transition-shadow duration-200"
+          className="relative rounded-2xl overflow-visible"
           style={{
+            background: "rgba(255,255,255,0.95)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
             boxShadow: focused
-              ? "0 8px 40px rgba(200, 168, 78, 0.2), 0 0 0 2px var(--color-gold)"
-              : "var(--shadow-lg)",
-            transform: focused ? "scale(1.02)" : "scale(1)",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              ? "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)"
+              : "0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)",
+            transition: "box-shadow 0.2s ease",
           }}
         >
-          <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            <Search size={18} style={{ color: focused ? "var(--color-gold)" : "var(--color-text-secondary)" }} />
-          </div>
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search Blackrock V2"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setFocused(true)}
-            className="w-full py-3.5 pl-12 pr-12 text-sm font-medium bg-transparent outline-none rounded-full"
-            style={{ color: "var(--color-text)" }}
-          />
-          <AnimatePresence>
+          <div className="flex items-center px-4 py-3">
+            <Search size={18} style={{ color: "#8e8e93" }} className="shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search Maps"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setFocused(true)}
+              className="flex-1 ml-3 text-[15px] bg-transparent outline-none placeholder:text-[#8e8e93]"
+              style={{ color: "#1c1c1e" }}
+            />
             {query && (
               <button
                 type="button"
                 onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer"
-                style={{ background: "var(--color-surface-hover)" }}
+                className="w-[18px] h-[18px] rounded-full flex items-center justify-center cursor-pointer shrink-0"
+                style={{ background: "#c7c7cc" }}
               >
-                <X size={11} style={{ color: "var(--color-text-secondary)" }} />
+                <X size={10} style={{ color: "#fff" }} strokeWidth={3} />
               </button>
             )}
-          </AnimatePresence>
+          </div>
         </div>
       </form>
 
       <AnimatePresence>
         {showDropdown && (
           <motion.div
-            className="glass-strong rounded-3xl mt-2 overflow-hidden"
-            style={{ boxShadow: "var(--shadow-lg)" }}
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ type: "spring" as const, stiffness: 400, damping: 28 }}
+            className="rounded-2xl mt-2 overflow-hidden"
+            style={{
+              background: "rgba(255,255,255,0.98)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
+            }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
           >
-            <div className="max-h-[60vh] overflow-y-auto p-3" data-lenis-prevent>
+            <div className="max-h-[320px] overflow-y-auto" data-lenis-prevent>
               {/* Search results */}
               {query.trim() && filtered.length > 0 && (
-                <div>
-                  {filtered.map((loc, i) => (
+                <div className="py-1">
+                  {filtered.map((loc) => (
                     <button
                       key={loc.id}
-                      onClick={() => { onSelect(loc); setQuery(loc.name); setFocused(false); }}
-                      className="w-full flex items-center gap-3 p-3 rounded-2xl text-left cursor-pointer hover:translate-x-1 transition-all duration-150"
-                      style={{ color: "var(--color-text)" }}
+                      onClick={() => { onSelect(loc); setQuery(""); setFocused(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors"
+                      style={{ color: "#1c1c1e" }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#f2f2f7"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                     >
-                      <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0"
-                        style={{ background: "var(--color-surface-hover)" }}>
+                      <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ background: "#f2f2f7" }}>
                         {loc.imageUrl ? (
                           <img src={loc.imageUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <MapPin size={16} style={{ color: "var(--color-gold)" }} />
-                          </div>
+                          <MapPin size={16} style={{ color: "#007aff" }} />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold truncate">{loc.name}</div>
-                        <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                          {loc.category} {loc.rating && `· ★ ${loc.rating}`}
+                        <div className="text-[15px] font-medium truncate">{loc.name}</div>
+                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>
+                          {loc.category}
                         </div>
                       </div>
-                      {loc.featured && (
-                        <Sparkles size={14} style={{ color: "var(--color-gold)" }} />
-                      )}
                     </button>
                   ))}
                 </div>
               )}
 
-              {/* Popular / Most Viewed */}
+              {/* Recents */}
               {!query.trim() && (
-                <>
-                  <div className="px-2 pt-1 pb-2">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: "var(--color-gold)" }}>
-                      <TrendingUp size={12} />
-                      Most Viewed
-                    </div>
+                <div className="py-1">
+                  <div className="px-4 py-2 text-[13px] font-semibold" style={{ color: "#8e8e93" }}>
+                    Recents
                   </div>
-                  {mostViewed.map((loc, i) => (
+                  {recentPlaces.map((loc) => (
                     <button
                       key={loc.id}
-                      onClick={() => { onSelect(loc); setQuery(loc.name); setFocused(false); }}
-                      className="w-full flex items-center gap-3 p-2.5 rounded-2xl text-left cursor-pointer hover:translate-x-1 transition-all duration-150"
-                      style={{ color: "var(--color-text)" }}
+                      onClick={() => { onSelect(loc); setFocused(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors"
+                      style={{ color: "#1c1c1e" }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#f2f2f7"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                     >
-                      <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0"
-                        style={{ background: "var(--color-surface-hover)" }}>
+                      <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ background: "#f2f2f7" }}>
                         {loc.imageUrl ? (
                           <img src={loc.imageUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <MapPin size={16} style={{ color: "var(--color-gold)" }} />
-                          </div>
+                          <MapPin size={16} style={{ color: "#007aff" }} />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium truncate">{loc.name}</div>
-                        <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                          {loc.category} · {((loc.views || 0) / 1000).toFixed(1)}k views
+                        <div className="text-[15px] font-medium truncate">{loc.name}</div>
+                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>
+                          {loc.category}
                         </div>
                       </div>
-                      <span className="text-xs font-bold tabular-nums shrink-0"
-                        style={{ color: "var(--color-gold)" }}>
-                        #{i + 1}
-                      </span>
                     </button>
                   ))}
-
-                  <div className="h-px my-2 mx-2" style={{ background: "var(--color-border)" }} />
-                  <div className="px-2 pb-1 pt-1">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: "var(--color-text-secondary)" }}>
-                      <Clock size={11} />
-                      Popular Searches
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 px-2 pb-2">
-                    {popularSearches.slice(0, 8).map((s, i) => (
-                      <button
-                        key={s}
-                        onClick={() => { setQuery(s); onSearch(s); }}
-                        className="px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-150"
-                        style={{
-                          background: "var(--color-surface)",
-                          color: "var(--color-text)",
-                          boxShadow: "var(--shadow-sm)",
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </>
+                </div>
               )}
             </div>
           </motion.div>

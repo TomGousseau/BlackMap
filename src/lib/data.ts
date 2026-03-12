@@ -13,10 +13,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "Ancient walled city with sacred sites for three major religions",
     featured: true,
     views: 28400,
-    reviews: [
-      { id: "r1", author: "Sarah M.", rating: 5, text: "Absolutely breathtaking. The history here is unmatched.", date: "2026-02-15" },
-      { id: "r2", author: "David K.", rating: 5, text: "A must-visit destination. Incredible atmosphere.", date: "2026-01-20" },
-    ],
   },
   {
     id: "tel-aviv",
@@ -29,9 +25,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "Vibrant Mediterranean beachfront with incredible nightlife",
     featured: true,
     views: 22100,
-    reviews: [
-      { id: "r3", author: "Emma L.", rating: 5, text: "Best beach city in the Middle East!", date: "2026-02-28" },
-    ],
   },
   {
     id: "dead-sea",
@@ -44,9 +37,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "The lowest point on Earth — float effortlessly in mineral-rich waters",
     featured: true,
     views: 19800,
-    reviews: [
-      { id: "r4", author: "Michael R.", rating: 5, text: "Surreal experience floating in the water.", date: "2026-03-01" },
-    ],
   },
   {
     id: "masada",
@@ -60,7 +50,7 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     featured: true,
     views: 15600,
   },
-  // Switzerland — GOLD FEATURED
+  // Switzerland
   {
     id: "zurich",
     name: "Zürich",
@@ -72,10 +62,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "Switzerland's largest city — finance, culture, lake views",
     featured: true,
     views: 34200,
-    reviews: [
-      { id: "r5", author: "Oliver S.", rating: 5, text: "Cleanest city I've ever visited. The lake is gorgeous.", date: "2026-02-10" },
-      { id: "r6", author: "Sophia W.", rating: 5, text: "Perfect blend of modern and traditional Swiss culture.", date: "2026-01-25" },
-    ],
   },
   {
     id: "zermatt",
@@ -88,9 +74,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "Iconic alpine village at the foot of the Matterhorn",
     featured: true,
     views: 41500,
-    reviews: [
-      { id: "r7", author: "James B.", rating: 5, text: "The Matterhorn at sunrise is life-changing.", date: "2026-03-05" },
-    ],
   },
   {
     id: "interlaken",
@@ -152,9 +135,6 @@ export const FEATURED_LOCATIONS: LocationData[] = [
     description: "Spain's vibrant capital — art, food, and golden sunsets",
     featured: true,
     views: 27500,
-    reviews: [
-      { id: "r8", author: "Carlos M.", rating: 5, text: "The heart of Spain! Incredible tapas everywhere.", date: "2026-02-20" },
-    ],
   },
 ];
 

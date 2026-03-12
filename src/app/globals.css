@@ -119,19 +119,28 @@ html, body {
 }
 
 /* Tile loading — seamless dark bg so no grey flash */
+.leaflet-container {
+  background: #1a1a1d !important;
+}
 .leaflet-tile {
-  background: #1c1c20 !important;
-  transition: opacity 0.15s ease-in-out !important;
+  background: #1a1a1d !important;
+  transition: opacity 0.3s ease-out !important;
 }
 .leaflet-tile-pane {
-  background: #1c1c20 !important;
+  background: #1a1a1d !important;
+}
+.leaflet-tile-container {
+  background: #1a1a1d !important;
 }
 .leaflet-fade-anim .leaflet-tile {
   will-change: opacity !important;
 }
 .leaflet-zoom-anim .leaflet-zoom-animated {
   will-change: transform !important;
-  transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1) !important;
+  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+}
+.leaflet-pan-anim .leaflet-tile-container {
+  transition: transform 0.25s ease-out !important;
 }
 
 /* ===== ANIMATIONS ===== */

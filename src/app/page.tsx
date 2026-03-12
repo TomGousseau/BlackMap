@@ -11,7 +11,7 @@ import { BusinessProfileButton } from "@/components/BusinessProfileButton";
 import { AddBusinessModal } from "@/components/AddBusinessModal";
 import { BusinessDetailPanel } from "@/components/BusinessDetailPanel";
 import { FEATURED_LOCATIONS, POPULAR_SEARCHES, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/data";
-import type { LocationData, BusinessProfile, BusinessReview } from "@/lib/types";
+import type { LocationData, BusinessProfile, BusinessReview, ReviewData } from "@/lib/types";
 import Lenis from "lenis";
 
 // Dynamic import Leaflet (no SSR)
@@ -103,7 +103,23 @@ export default function HomePage() {
   }, [showStatus]);
 
   const handleZoomIn = useCallback(() => setZoom((z) => Math.min(z + 1, 18)), []);
-  const handleZoomOut = useCallback(() => setZoom((z) => Math.max(z - 1, 2)), []);
+  const handleZoomOut = useCallback(() => setZoom((z) => Math.max(z - 1, 3)), []);
+
+  const handleAddLocationReview = useCallback((locId: string, review: ReviewData) => {
+    setLocations((prev) =>
+      prev.map((l) => {
+        if (l.id !== locId) return l;
+        const newReviews = [...(l.reviews || []), review];
+        return { ...l, reviews: newReviews };
+      })
+    );
+    setSelectedLocation((prev) => {
+      if (!prev || prev.id !== locId) return prev;
+      const newReviews = [...(prev.reviews || []), review];
+      return { ...prev, reviews: newReviews };
+    });
+    showStatus("Review added!");
+  }, [showStatus]);
 
   const handleLocate = useCallback(() => {
     if (navigator.geolocation) {
@@ -233,6 +249,7 @@ export default function HomePage() {
       <PlaceDetail
         location={selectedLocation}
         onClose={() => setSelectedLocation(null)}
+        onAddReview={handleAddLocationReview}
       />
 
       {/* Add location modal */}
