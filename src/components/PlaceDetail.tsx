@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Navigation, Globe, Share, Bookmark, Eye, Send } from "lucide-react";
+import { X, Star, Navigation, Globe, Share, Bookmark, Send } from "lucide-react";
 import type { LocationData, ReviewData } from "@/lib/types";
 
 interface PlaceDetailProps {
@@ -94,43 +94,22 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
 
               {/* Action buttons */}
               <div className="px-6 pb-5 grid grid-cols-4 gap-3">
-                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#d4af37" }}>
+                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#d4af37" }}>
                   <Navigation size={18} style={{ color: "#000" }} />
                   <span className="text-[11px] font-semibold" style={{ color: "#000" }}>Directions</span>
                 </button>
-                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
                   <Globe size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Website</span>
                 </button>
-                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
                   <Share size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Share</span>
                 </button>
-                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
                   <Bookmark size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Save</span>
                 </button>
-              </div>
-
-              {/* Stats row */}
-              <div className="px-6 pb-5 flex items-center gap-5">
-                {location.rating != null && (
-                  <div className="flex items-center gap-2">
-                    <Star size={16} fill="#d4af37" style={{ color: "#d4af37" }} />
-                    <span className="text-[15px] font-semibold" style={{ color: "#fff" }}>{location.rating}</span>
-                  </div>
-                )}
-                {location.views != null && location.views > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <Eye size={14} style={{ color: "#8e8e93" }} />
-                    <span className="text-[13px]" style={{ color: "#8e8e93" }}>{(location.views / 1000).toFixed(1)}k</span>
-                  </div>
-                )}
-                {location.featured && (
-                  <span className="text-[12px] font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(212,175,55,0.2)", color: "#d4af37" }}>
-                    Featured
-                  </span>
-                )}
               </div>
 
               {/* Divider */}
