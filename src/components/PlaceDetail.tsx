@@ -272,30 +272,32 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
                   <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-5" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
                     
-                    {/* Star picker - animated */}
+                    {/* Star picker */}
                     <div className="flex items-center gap-2 mb-5">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <motion.button 
-                          key={s} 
-                          className="cursor-pointer"
-                          onMouseEnter={() => setHoverRating(s)}
-                          onMouseLeave={() => setHoverRating(0)}
-                          onClick={() => setReviewRating(s)}
-                          whileHover={{ scale: 1.2 }}
-                          whileTap={{ scale: 0.9 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                        >
-                          <Star 
-                            size={24}
-                            fill={s <= (hoverRating || reviewRating) ? "#d4af37" : "transparent"}
+                      {[1, 2, 3, 4, 5].map((s) => {
+                        const isActive = s <= (hoverRating || reviewRating);
+                        return (
+                          <button 
+                            key={s} 
+                            className="cursor-pointer"
+                            onMouseEnter={() => setHoverRating(s)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setReviewRating(s)}
                             style={{ 
-                              color: s <= (hoverRating || reviewRating) ? "#d4af37" : "#48484a",
-                              filter: s <= (hoverRating || reviewRating) ? "drop-shadow(0 0 4px rgba(212, 175, 55, 0.5))" : "none",
-                              transition: "color 0.15s ease, filter 0.15s ease",
+                              transform: "scale(1)",
+                              transition: "transform 0.15s ease",
                             }}
-                          />
-                        </motion.button>
-                      ))}
+                            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.9)")}
+                            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                          >
+                            <Star 
+                              size={24}
+                              fill={isActive ? "#d4af37" : "transparent"}
+                              color={isActive ? "#d4af37" : "#48484a"}
+                            />
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* Name input */}
