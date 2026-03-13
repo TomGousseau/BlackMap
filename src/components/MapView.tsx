@@ -9,7 +9,7 @@ import type { LocationData } from "@/lib/types";
 function createMarkerIcon(isGold = false) {
   const color = isGold ? "#c8a84e" : "#0a84ff";
   return L.divIcon({
-    className: "",
+    className: "map-marker",
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
