@@ -125,29 +125,36 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
 
               {/* Website button */}
               {business.website && (
-                <a
+                <motion.a
                   href={business.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
+                  className="inline-flex items-center gap-2.5 mt-5 px-5 py-3.5 rounded-full text-[13px] font-semibold"
                   style={{
                     background: "linear-gradient(135deg, #2a2a2e 0%, #222224 100%)",
                     color: "#d4af37",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.06)",
                   }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(212,175,55,0.2), inset 0 1px 0 rgba(255,255,255,0.1)" }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Globe size={14} />
+                  <Globe size={16} />
                   Visit Website
-                  <ExternalLink size={12} />
-                </a>
+                  <ExternalLink size={14} />
+                </motion.a>
               )}
 
-              {/* Description */}
+              {/* About section */}
               {business.description && (
-                <p className="text-[13px] mt-4 leading-relaxed" style={{ color: "#a1a1a6" }}>
-                  {business.description}
-                </p>
+                <div className="mt-5">
+                  <h3 className="text-[11px] font-bold tracking-wider mb-2" style={{ color: "#6e6e73" }}>
+                    ABOUT
+                  </h3>
+                  <p className="text-[13px] leading-relaxed" style={{ color: "#a1a1a6" }}>
+                    {business.description}
+                  </p>
+                </div>
               )}
             </div>
 
