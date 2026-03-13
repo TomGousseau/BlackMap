@@ -258,10 +258,18 @@ export default function HomePage() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
           >
-            <div className="glass-strong rounded-full px-6 py-3 gold-border shimmer">
+            <div className="glass-strong rounded-full px-6 py-3 gold-border shimmer flex items-center gap-3">
               <span className="text-sm font-semibold gold-text">
                 Click on the map to place a pin
               </span>
+              <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>or</span>
+              <button
+                onClick={() => { setShowAddModal(true); setAddingLocation(false); }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer"
+                style={{ background: "var(--color-gold)", color: "#000" }}
+              >
+                Enter Address
+              </button>
             </div>
           </motion.div>
         )}
