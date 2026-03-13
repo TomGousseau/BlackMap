@@ -35,9 +35,19 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
         setFocused(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && focused) {
+        setFocused(false);
+        setQuery("");
+      }
+    }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [focused]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +113,7 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                     <button
                       key={loc.id}
                       onClick={() => { onSelect(loc); setQuery(""); setFocused(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
+                      className="w-full flex items-center gap-3 pl-5 pr-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
                     >
                       <div 
                         className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
@@ -124,14 +134,14 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                 </div>
               ) : (
                 <div className="py-1">
-                  <div className="px-4 py-2 text-[13px] font-medium" style={{ color: "#8e8e93" }}>
+                  <div className="px-5 py-2 text-[13px] font-medium" style={{ color: "#8e8e93" }}>
                     Recents
                   </div>
                   {recentPlaces.map((loc) => (
                     <button
                       key={loc.id}
                       onClick={() => { onSelect(loc); setFocused(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
+                      className="w-full flex items-center gap-3 pl-5 pr-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
                     >
                       <div 
                         className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
