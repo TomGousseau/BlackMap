@@ -93,11 +93,11 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               </div>
 
               {/* Action buttons */}
-              <div className="px-6 pb-5 grid grid-cols-4 gap-3">
+              <div className="px-6 pb-6 grid grid-cols-4 gap-3">
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#d4af37" }}
-                  whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  whileHover={{ scale: 1.08, boxShadow: "0 0 30px rgba(212,175,55,0.6), 0 8px 24px rgba(212,175,55,0.4)" }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Navigation size={18} style={{ color: "#000" }} />
@@ -133,20 +133,20 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               </div>
 
               {/* Divider */}
-              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 my-2" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
-                <div className="px-6 py-7">
+                <div className="px-6 py-6">
                   <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
-                  <p style={{ color: "#a1a1a6", fontSize: "14px", lineHeight: 1.7 }}>
+                  <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                     {location.description}
                   </p>
                 </div>
               )}
 
               {/* Divider */}
-              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 my-2" style={{ background: "#2a2a2e" }} />
 
               {/* Ratings & Reviews */}
               <div className="px-6 py-5">
@@ -200,7 +200,7 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               {/* Write Review - separate section */}
               {onAddReview && (
                 <>
-                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+                  <div className="h-[1px] mx-6 my-2" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
                     
