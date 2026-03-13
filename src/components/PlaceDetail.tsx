@@ -37,7 +37,7 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
     <AnimatePresence>
       {location && (
         <motion.div
-          className="fixed top-4 left-4 bottom-4 z-50 w-full max-w-[360px]"
+          className="fixed top-4 left-4 bottom-4 z-50 w-full max-w-[380px]"
           initial={{ x: "-120%", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: "-120%", opacity: 0 }}
@@ -46,152 +46,127 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
           <div
             className="h-full flex flex-col overflow-hidden rounded-3xl"
             style={{
-              background: "linear-gradient(180deg, #1a1a1e 0%, #121214 100%)",
-              boxShadow: "0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)",
+              background: "#161618",
+              boxShadow: "0 25px 80px rgba(0,0,0,0.8)",
             }}
           >
-            {/* Gloss overlay */}
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-3xl"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 40%, rgba(0,0,0,0.15) 100%)",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
-            />
-
             {/* Image header */}
             {location.imageUrl && (
-              <div className="relative w-full h-48 shrink-0 rounded-t-3xl overflow-hidden">
+              <div className="relative w-full h-44 shrink-0">
                 <img
                   src={location.imageUrl}
                   alt={location.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #1a1a1e 0%, transparent 60%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #161618 0%, transparent 70%)" }} />
                 <button
                   onClick={onClose}
-                  className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
-                  style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)" }}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                  style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)" }}
                 >
-                  <X size={16} style={{ color: "#fff" }} />
+                  <X size={14} style={{ color: "#fff" }} />
                 </button>
               </div>
             )}
 
             {/* Scrollable body */}
-            <div className="flex-1 overflow-y-auto relative z-10" data-lenis-prevent>
-              {/* Title section */}
-              <div className="px-5 pt-4 pb-3">
+            <div className="flex-1 overflow-y-auto" data-lenis-prevent>
+              {/* Title */}
+              <div className="px-6 pt-5 pb-4">
                 {!location.imageUrl && (
-                  <div className="flex justify-end mb-2">
+                  <div className="flex justify-end mb-3">
                     <button
                       onClick={onClose}
-                      className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
-                      style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                      style={{ background: "rgba(255,255,255,0.1)" }}
                     >
-                      <X size={16} style={{ color: "#fff" }} />
+                      <X size={14} style={{ color: "#fff" }} />
                     </button>
                   </div>
                 )}
-                <h2 className="text-xl font-bold leading-tight" style={{ color: "#f5f5f7" }}>
+                <h2 className="text-[22px] font-semibold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
                   {location.name}
                 </h2>
                 {location.category && (
-                  <p className="text-[13px] mt-1 font-medium" style={{ color: "#86868b" }}>{location.category}</p>
+                  <p className="text-[14px] mt-1" style={{ color: "#8e8e93" }}>{location.category}</p>
                 )}
               </div>
 
-              {/* Action buttons row */}
-              <div className="px-5 pb-4 flex gap-2">
-                <button 
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
-                  style={{ background: "linear-gradient(135deg, #0a84ff 0%, #0070e0 100%)", boxShadow: "0 4px 12px rgba(10,132,255,0.3)" }}
-                >
-                  <Navigation size={18} style={{ color: "#fff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#fff" }}>Directions</span>
+              {/* Action buttons */}
+              <div className="px-6 pb-5 grid grid-cols-4 gap-3">
+                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#d4af37" }}>
+                  <Navigation size={18} style={{ color: "#000" }} />
+                  <span className="text-[11px] font-semibold" style={{ color: "#000" }}>Directions</span>
                 </button>
-                <button 
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-                >
-                  <Globe size={18} style={{ color: "#0a84ff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Website</span>
+                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                  <Globe size={18} style={{ color: "#fff" }} />
+                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Website</span>
                 </button>
-                <button 
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-                >
-                  <Share size={18} style={{ color: "#0a84ff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Share</span>
+                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                  <Share size={18} style={{ color: "#fff" }} />
+                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Share</span>
                 </button>
-                <button 
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-                >
-                  <Bookmark size={18} style={{ color: "#0a84ff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Save</span>
+                <button className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{ background: "#232326" }}>
+                  <Bookmark size={18} style={{ color: "#fff" }} />
+                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Save</span>
                 </button>
               </div>
 
-              {/* Info bar */}
-              <div 
-                className="mx-5 mb-4 flex items-center gap-4 px-4 py-3 rounded-2xl" 
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-              >
+              {/* Stats row */}
+              <div className="px-6 pb-5 flex items-center gap-5">
                 {location.rating != null && (
-                  <div className="flex items-center gap-1.5">
-                    <Star size={14} fill="#d4af37" style={{ color: "#d4af37" }} />
-                    <span className="text-sm font-bold" style={{ color: "#f5f5f7" }}>{location.rating}</span>
+                  <div className="flex items-center gap-2">
+                    <Star size={16} fill="#d4af37" style={{ color: "#d4af37" }} />
+                    <span className="text-[15px] font-semibold" style={{ color: "#fff" }}>{location.rating}</span>
                   </div>
                 )}
                 {location.views != null && location.views > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Eye size={13} style={{ color: "#86868b" }} />
-                    <span className="text-xs font-medium" style={{ color: "#86868b" }}>{(location.views / 1000).toFixed(1)}k</span>
+                  <div className="flex items-center gap-1.5">
+                    <Eye size={14} style={{ color: "#8e8e93" }} />
+                    <span className="text-[13px]" style={{ color: "#8e8e93" }}>{(location.views / 1000).toFixed(1)}k</span>
                   </div>
                 )}
                 {location.featured && (
-                  <span 
-                    className="text-[11px] font-semibold px-2.5 py-1 rounded-full" 
-                    style={{ background: "rgba(212,175,55,0.15)", color: "#d4af37", border: "1px solid rgba(212,175,55,0.2)" }}
-                  >
+                  <span className="text-[12px] font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(212,175,55,0.2)", color: "#d4af37" }}>
                     Featured
                   </span>
                 )}
               </div>
 
-              <div className="h-px mx-5" style={{ background: "rgba(255,255,255,0.06)" }} />
+              {/* Divider */}
+              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
-                <div className="px-5 py-4">
-                  <h3 className="text-[13px] font-bold mb-2 tracking-wide" style={{ color: "#86868b" }}>ABOUT</h3>
-                  <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-[13px] leading-relaxed" style={{ color: "#a1a1a6" }}>{location.description}</p>
-                  </div>
+                <div className="px-6 py-5">
+                  <h3 className="text-[12px] font-semibold tracking-wider mb-3" style={{ color: "#8e8e93" }}>ABOUT</h3>
+                  <p className="text-[14px] leading-[1.6]" style={{ color: "#c7c7cc" }}>
+                    {location.description}
+                  </p>
                 </div>
               )}
 
-              <div className="h-px mx-5" style={{ background: "rgba(255,255,255,0.06)" }} />
+              {/* Divider */}
+              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
 
               {/* Ratings & Reviews */}
-              <div className="px-5 py-4">
-                <h3 className="text-[13px] font-bold mb-3 tracking-wide" style={{ color: "#86868b" }}>RATINGS & REVIEWS</h3>
+              <div className="px-6 py-5">
+                <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RATINGS & REVIEWS</h3>
 
                 {location.rating != null && (
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-4xl font-bold" style={{ color: "#f5f5f7" }}>{location.rating}</span>
+                  <div className="flex items-center gap-4 mb-5">
+                    <span className="text-[44px] font-bold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>{location.rating}</span>
                     <div>
-                      <div className="flex items-center gap-0.5">
+                      <div className="flex items-center gap-1 mb-1">
                         {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} size={14}
+                          <Star key={s} size={16}
                             fill={s <= Math.round(location.rating!) ? "#d4af37" : "transparent"}
-                            style={{ color: s <= Math.round(location.rating!) ? "#d4af37" : "#3a3a3c" }}
+                            style={{ color: s <= Math.round(location.rating!) ? "#d4af37" : "#48484a" }}
                           />
                         ))}
                       </div>
-                      <span className="text-[11px] font-medium" style={{ color: "#86868b" }}>
-                        {(location.reviews?.length || 0)} review{(location.reviews?.length || 0) !== 1 ? "s" : ""}
+                      <span className="text-[13px]" style={{ color: "#8e8e93" }}>
+                        {(location.reviews?.length || 0)} reviews
                       </span>
                     </div>
                   </div>
@@ -199,84 +174,87 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
 
                 {/* Existing reviews */}
                 {location.reviews && location.reviews.length > 0 && (
-                  <div className="space-y-2.5 mb-4">
+                  <div className="space-y-3 mb-5">
                     {location.reviews.map((r) => (
-                      <div 
-                        key={r.id} 
-                        className="p-4 rounded-2xl" 
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                      >
+                      <div key={r.id} className="p-4 rounded-2xl" style={{ background: "#1e1e21" }}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[13px] font-semibold" style={{ color: "#f5f5f7" }}>{r.author}</span>
+                          <span className="text-[14px] font-semibold" style={{ color: "#fff" }}>{r.author}</span>
                           <div className="flex items-center gap-0.5">
                             {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} size={10}
+                              <Star key={i} size={12}
                                 fill={i < r.rating ? "#d4af37" : "transparent"}
-                                style={{ color: i < r.rating ? "#d4af37" : "#3a3a3c" }}
+                                style={{ color: i < r.rating ? "#d4af37" : "#48484a" }}
                               />
                             ))}
                           </div>
                         </div>
-                        <p className="text-[13px] leading-relaxed" style={{ color: "#a1a1a6" }}>{r.text}</p>
-                        <span className="text-[11px] mt-2 block font-medium" style={{ color: "#48484a" }}>{r.date}</span>
+                        <p className="text-[13px] leading-[1.5]" style={{ color: "#a1a1a6" }}>{r.text}</p>
+                        <span className="text-[12px] mt-2 block" style={{ color: "#636366" }}>{r.date}</span>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
 
-                {/* Write a review */}
-                {onAddReview && (
-                  <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-[11px] font-bold tracking-wide mb-3" style={{ color: "#86868b" }}>WRITE A REVIEW</p>
-                    <div className="flex items-center gap-1.5 mb-3">
+              {/* Write Review - separate section */}
+              {onAddReview && (
+                <>
+                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+                  <div className="px-6 py-5">
+                    <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
+                    
+                    {/* Star picker */}
+                    <div className="flex items-center gap-2 mb-4">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <button key={s} className="cursor-pointer transition-transform duration-150 hover:scale-110"
+                        <button key={s} className="cursor-pointer"
                           onMouseEnter={() => setHoverRating(s)}
                           onMouseLeave={() => setHoverRating(0)}
                           onClick={() => setReviewRating(s)}
                         >
-                          <Star size={20}
+                          <Star size={24}
                             fill={s <= (hoverRating || reviewRating) ? "#d4af37" : "transparent"}
-                            style={{ color: s <= (hoverRating || reviewRating) ? "#d4af37" : "#3a3a3c", transition: "color 0.15s" }}
+                            style={{ color: s <= (hoverRating || reviewRating) ? "#d4af37" : "#48484a" }}
                           />
                         </button>
                       ))}
                     </div>
+
+                    {/* Name input */}
                     <input
                       type="text"
                       value={reviewAuthor}
                       onChange={(e) => setReviewAuthor(e.target.value)}
                       placeholder="Your name"
-                      className="w-full py-3 px-4 rounded-xl text-[13px] font-medium outline-none mb-2 transition-all duration-200 focus:ring-2 focus:ring-[#d4af37]/30"
-                      style={{ background: "rgba(255,255,255,0.06)", color: "#f5f5f7", border: "1px solid rgba(255,255,255,0.08)" }}
+                      className="w-full py-3.5 px-4 rounded-xl text-[14px] outline-none mb-3"
+                      style={{ background: "#1e1e21", color: "#fff", border: "none" }}
                     />
-                    <div className="flex gap-2">
+
+                    {/* Review input + send */}
+                    <div className="flex gap-3">
                       <input
                         type="text"
                         value={reviewText}
                         onChange={(e) => setReviewText(e.target.value)}
                         placeholder="Write your review..."
-                        className="flex-1 py-3 px-4 rounded-xl text-[13px] font-medium outline-none transition-all duration-200 focus:ring-2 focus:ring-[#d4af37]/30"
-                        style={{ background: "rgba(255,255,255,0.06)", color: "#f5f5f7", border: "1px solid rgba(255,255,255,0.08)" }}
+                        className="flex-1 py-3.5 px-4 rounded-xl text-[14px] outline-none"
+                        style={{ background: "#1e1e21", color: "#fff", border: "none" }}
                         onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
                       />
                       <button
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer"
                         style={{ 
-                          background: canSubmit ? "linear-gradient(135deg, #d4af37 0%, #c8a035 100%)" : "rgba(255,255,255,0.06)", 
-                          opacity: canSubmit ? 1 : 0.4,
-                          boxShadow: canSubmit ? "0 4px 16px rgba(212,175,55,0.3)" : "none",
-                          border: canSubmit ? "none" : "1px solid rgba(255,255,255,0.08)",
+                          background: canSubmit ? "#d4af37" : "#2a2a2e", 
+                          opacity: canSubmit ? 1 : 0.5,
                         }}
                       >
-                        <Send size={16} style={{ color: canSubmit ? "#000" : "#6e6e73" }} />
+                        <Send size={18} style={{ color: canSubmit ? "#000" : "#636366" }} />
                       </button>
                     </div>
                   </div>
-                )}
-              </div>
+                </>
+              )}
 
               <div className="h-6" />
             </div>
