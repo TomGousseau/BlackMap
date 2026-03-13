@@ -5,9 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "re
 import L from "leaflet";
 import type { LocationData } from "@/lib/types";
 
-// Custom gold marker icon
-function createMarkerIcon(isGold = false) {
-  const color = isGold ? "#c8a84e" : "#0a84ff";
+// Custom marker icons
+function createMarkerIcon(color: string) {
   return L.divIcon({
     className: "",
     iconSize: [32, 32],
@@ -23,8 +22,9 @@ function createMarkerIcon(isGold = false) {
   });
 }
 
-const goldIcon = createMarkerIcon(true);
-const blueIcon = createMarkerIcon(false);
+const goldIcon = createMarkerIcon("#c8a84e");
+const blueIcon = createMarkerIcon("#0a84ff");
+const redIcon = createMarkerIcon("#ff3b30");
 
 // Minimum zoom level to show markers when there are 200+ locations
 const MIN_ZOOM_FOR_MARKERS = 8;
@@ -112,39 +112,46 @@ function ZoomAwareMarkers({
 
   return (
     <>
-      {visibleLocations.map((loc) => (
-        <Marker
-          key={loc.id}
-          position={[loc.lat, loc.lng]}
-          icon={loc.featured ? goldIcon : blueIcon}
-          eventHandlers={{
-            click: () => onLocationClick?.(loc),
-          }}
-        >
-          <Popup>
-            <div style={{ padding: "12px 16px", minWidth: 180, background: "#26262a", color: "#f0f0f2" }}>
-              {loc.imageUrl && (
-                <div style={{
-                  width: "100%", height: 100, borderRadius: 12,
-                  overflow: "hidden", marginBottom: 8
-                }}>
-                  <img src={loc.imageUrl} alt={loc.name}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                </div>
-              )}
-              <div style={{ fontWeight: 600, fontSize: 14, color: "#f0f0f2" }}>{loc.name}</div>
-              {loc.category && (
-                <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 2 }}>{loc.category}</div>
-              )}
-              {loc.rating && (
-                <div style={{ fontSize: 12, marginTop: 4, color: "#d4b85c" }}>
-                  {"★".repeat(Math.floor(loc.rating))} {loc.rating}
-                </div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {visibleLocations.map((loc) => {
+        const isSaved = savedLocationIds.has(loc.id);
+        let icon = blueIcon;
+        if (isSaved) icon = redIcon;
+        else if (loc.featured) icon = goldIcon;
+        
+        return (
+          <Marker
+            key={loc.id}
+            position={[loc.lat, loc.lng]}
+            icon={icon}
+            eventHandlers={{
+              click: () => onLocationClick?.(loc),
+            }}
+          >
+            <Popup>
+              <div style={{ padding: "12px 16px", minWidth: 180, background: "#26262a", color: "#f0f0f2" }}>
+                {loc.imageUrl && (
+                  <div style={{
+                    width: "100%", height: 100, borderRadius: 12,
+                    overflow: "hidden", marginBottom: 8
+                  }}>
+                    <img src={loc.imageUrl} alt={loc.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
+                )}
+                <div style={{ fontWeight: 600, fontSize: 14, color: "#f0f0f2" }}>{loc.name}</div>
+                {loc.category && (
+                  <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 2 }}>{loc.category}</div>
+                )}
+                {loc.rating && (
+                  <div style={{ fontSize: 12, marginTop: 4, color: "#d4b85c" }}>
+                    {"★".repeat(Math.floor(loc.rating))} {loc.rating}
+                  </div>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
     </>
   );
 }

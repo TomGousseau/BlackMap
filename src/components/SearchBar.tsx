@@ -95,7 +95,7 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Apple Maps"
+                  placeholder="Searching..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   autoFocus
