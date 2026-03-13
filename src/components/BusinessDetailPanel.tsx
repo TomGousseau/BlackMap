@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Building2, Globe, Star, MessageSquare, Send, ExternalLink } from "lucide-react";
 import type { BusinessProfile, BusinessReview } from "@/lib/types";
@@ -16,6 +16,16 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!business) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [business, onClose]);
 
   const canSubmit = reviewText.trim() && reviewAuthor.trim() && reviewRating > 0;
 
