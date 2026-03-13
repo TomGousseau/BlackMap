@@ -2,19 +2,21 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Plus, Star, Globe, ChevronRight, X } from "lucide-react";
+import { Building2, Plus, Star, Globe, ChevronRight, X, Shield, Sparkles, Clock } from "lucide-react";
 import type { BusinessProfile } from "@/lib/types";
 
 interface BusinessProfileButtonProps {
   businesses: BusinessProfile[];
   onAddBusiness: () => void;
   onSelectBusiness: (biz: BusinessProfile) => void;
+  onOpenAdmin?: () => void;
 }
 
 export function BusinessProfileButton({
   businesses,
   onAddBusiness,
   onSelectBusiness,
+  onOpenAdmin,
 }: BusinessProfileButtonProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -92,6 +94,29 @@ export function BusinessProfileButton({
 
             <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />
 
+            {/* Admin button */}
+            {onOpenAdmin && (
+              <>
+                <motion.button
+                  onClick={() => { onOpenAdmin(); setOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer"
+                  style={{ color: "var(--color-text)" }}
+                  whileHover={{ background: "var(--color-surface-hover)" }}
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    style={{ background: "rgba(175, 82, 222, 0.15)" }}>
+                    <Shield size={16} style={{ color: "#af52de" }} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold" style={{ color: "#af52de" }}>Admin Panel</div>
+                    <div className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>Approve businesses</div>
+                  </div>
+                  <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
+                </motion.button>
+                <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />
+              </>
+            )}
+
             {/* List */}
             <div className="max-h-72 overflow-y-auto p-2" data-lenis-prevent>
               {businesses.length === 0 ? (
@@ -114,12 +139,12 @@ export function BusinessProfileButton({
                     key={biz.id}
                     onClick={() => { onSelectBusiness(biz); setOpen(false); }}
                     className="w-full flex items-center gap-3 p-2.5 rounded-xl text-left cursor-pointer"
-                    style={{ color: "var(--color-text)" }}
+                    style={{ color: "var(--color-text)", opacity: biz.approved === false ? 0.6 : 1 }}
                     whileHover={{ background: "var(--color-surface-hover)", x: 2 }}
                   >
                     {/* Avatar */}
                     <div
-                      className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                      className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative"
                       style={{ background: "var(--color-surface-hover)" }}
                     >
                       {biz.imageUrl ? (
@@ -127,11 +152,26 @@ export function BusinessProfileButton({
                       ) : (
                         <Building2 size={18} style={{ color: "var(--color-gold)" }} />
                       )}
+                      {biz.important && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
+                          style={{ background: "#af52de" }}>
+                          <Sparkles size={10} style={{ color: "#fff" }} />
+                        </div>
+                      )}
                     </div>
 
                     {/* Info */}
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold truncate">{biz.name}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold truncate">{biz.name}</span>
+                        {biz.approved === false && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5"
+                            style={{ background: "rgba(255, 149, 0, 0.15)", color: "#ff9500" }}>
+                            <Clock size={8} />
+                            Pending
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         {biz.category && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full"

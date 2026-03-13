@@ -10,6 +10,7 @@ import { AddLocationModal } from "@/components/AddLocationModal";
 import { BusinessProfileButton } from "@/components/BusinessProfileButton";
 import { AddBusinessModal } from "@/components/AddBusinessModal";
 import { BusinessDetailPanel } from "@/components/BusinessDetailPanel";
+import { AdminPanel } from "@/components/AdminPanel";
 import { FEATURED_LOCATIONS, POPULAR_SEARCHES, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/data";
 import type { LocationData, BusinessProfile, BusinessReview, ReviewData } from "@/lib/types";
 import Lenis from "lenis";
@@ -35,6 +36,7 @@ export default function HomePage() {
   const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
   const [showAddBusiness, setShowAddBusiness] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessProfile | null>(null);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [savedLocationIds, setSavedLocationIds] = useState<Set<string>>(new Set());
 
   // Lenis smooth scroll
@@ -120,9 +122,27 @@ export default function HomePage() {
   }, [showStatus]);
 
   const handleSaveBusiness = useCallback((biz: BusinessProfile) => {
-    setBusinesses((prev) => [...prev, biz]);
-    showStatus(`"${biz.name}" created!`);
+    setBusinesses((prev) => [...prev, { ...biz, approved: false }]);
+    showStatus(`"${biz.name}" created! Pending approval.`);
   }, [showStatus]);
+
+  const handleApproveBusiness = useCallback((bizId: string) => {
+    setBusinesses((prev) =>
+      prev.map((b) => (b.id === bizId ? { ...b, approved: true } : b))
+    );
+    showStatus("Business approved!");
+  }, [showStatus]);
+
+  const handleRejectBusiness = useCallback((bizId: string) => {
+    setBusinesses((prev) => prev.filter((b) => b.id !== bizId));
+    showStatus("Business rejected");
+  }, [showStatus]);
+
+  const handleToggleImportant = useCallback((bizId: string) => {
+    setBusinesses((prev) =>
+      prev.map((b) => (b.id === bizId ? { ...b, important: !b.important } : b))
+    );
+  }, []);
 
   const handleAddBusinessReview = useCallback((bizId: string, review: BusinessReview) => {
     setBusinesses((prev) =>
@@ -280,6 +300,7 @@ export default function HomePage() {
         businesses={businesses}
         onAddBusiness={() => setShowAddBusiness(true)}
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}
+        onOpenAdmin={() => setShowAdminPanel(true)}
       />
 
       {/* Business detail side panel */}
@@ -294,6 +315,16 @@ export default function HomePage() {
         isOpen={showAddBusiness}
         onClose={() => setShowAddBusiness(false)}
         onSave={handleSaveBusiness}
+      />
+
+      {/* Admin panel */}
+      <AdminPanel
+        isOpen={showAdminPanel}
+        onClose={() => setShowAdminPanel(false)}
+        businesses={businesses}
+        onApprove={handleApproveBusiness}
+        onReject={handleRejectBusiness}
+        onToggleImportant={handleToggleImportant}
       />
 
       {/* Place detail */}

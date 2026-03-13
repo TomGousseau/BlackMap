@@ -35,6 +35,8 @@ export interface BusinessProfile {
   reputation: number; // 0-5
   reviews: BusinessReview[];
   createdAt: string;
+  approved?: boolean; // Needs admin approval
+  important?: boolean; // Purple badge - set by admin
 }
 
 export interface BusinessReview {

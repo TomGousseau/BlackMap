@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Building2, Globe, Star, MessageSquare, Send, ExternalLink } from "lucide-react";
+import { X, Building2, Globe, Star, MessageSquare, Send, ExternalLink, Sparkles } from "lucide-react";
 import type { BusinessProfile, BusinessReview } from "@/lib/types";
 
 interface BusinessDetailPanelProps {
@@ -112,9 +112,24 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
               </div>
 
               {/* Name & Category */}
-              <h2 className="text-xl font-bold tracking-tight mb-1" style={{ color: "#f5f5f7" }}>
-                {business.name}
-              </h2>
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-xl font-bold tracking-tight" style={{ color: "#f5f5f7" }}>
+                  {business.name}
+                </h2>
+                {business.important && (
+                  <span 
+                    className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                    style={{
+                      background: "rgba(175, 82, 222, 0.2)",
+                      color: "#af52de",
+                      border: "1px solid rgba(175, 82, 222, 0.3)",
+                    }}
+                  >
+                    <Sparkles size={10} />
+                    Important
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {business.category && (
                   <span 
