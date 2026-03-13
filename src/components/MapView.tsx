@@ -144,10 +144,12 @@ function ZoomAwareMarkers({
                 {loc.category && (
                   <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 2 }}>{loc.category}</div>
                 )}
-                {loc.rating && (
+                {loc.rating ? (
                   <div style={{ fontSize: 12, marginTop: 4, color: "#d4b85c" }}>
                     {"★".repeat(Math.floor(loc.rating))} {loc.rating}
                   </div>
+                ) : (
+                  <div style={{ fontSize: 11, marginTop: 4, color: "#8e8e93" }}>Unreviewed</div>
                 )}
               </div>
             </Popup>
