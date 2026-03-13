@@ -96,48 +96,48 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               <div className="px-6 pb-5 grid grid-cols-4 gap-3">
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: "#d4af37" }}
-                  whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  style={{ background: "#232326" }}
+                  whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Navigation size={18} style={{ color: "#000" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#000" }}>Directions</span>
+                  <Navigation size={18} className="action-icon" />
+                  <span className="text-[11px] font-semibold action-text">Directions</span>
                 </motion.button>
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#2a2a2e", boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Globe size={18} style={{ color: "#fff" }} />
-                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Website</span>
+                  <Globe size={18} className="action-icon" />
+                  <span className="text-[11px] font-medium action-text">Website</span>
                 </motion.button>
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#2a2a2e", boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Share size={18} style={{ color: "#fff" }} />
-                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Share</span>
+                  <Share size={18} className="action-icon" />
+                  <span className="text-[11px] font-medium action-text">Share</span>
                 </motion.button>
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#2a2a2e", boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Bookmark size={18} style={{ color: "#fff" }} />
-                  <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Save</span>
+                  <Bookmark size={18} className="action-icon" />
+                  <span className="text-[11px] font-medium action-text">Save</span>
                 </motion.button>
               </div>
 
               {/* Divider */}
-              <div className="h-[1px] mx-6 mt-3 mb-3" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
-                <div className="px-6 py-6">
+                <div className="px-6 py-7">
                   <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
                   <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                     {location.description}
@@ -146,10 +146,10 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               )}
 
               {/* Divider */}
-              <div className="h-[1px] mx-6 mt-3 mb-3" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
 
               {/* Ratings & Reviews */}
-              <div className="px-6 py-6">
+              <div className="px-6 py-5">
                 <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RATINGS & REVIEWS</h3>
 
                 {location.rating != null && (location.reviews?.length || 0) > 0 ? (
@@ -200,8 +200,8 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               {/* Write Review - separate section */}
               {onAddReview && (
                 <>
-                  <div className="h-[1px] mx-6 mt-3 mb-3" style={{ background: "#2a2a2e" }} />
-                  <div className="px-6 py-6">
+                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+                  <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
                     
                     {/* Star picker */}

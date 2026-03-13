@@ -169,3 +169,9 @@ html, body {
   50% { box-shadow: 0 0 0 8px rgba(212, 184, 92, 0); }
 }
 .pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+
+/* Action button hover color change */
+.action-icon { color: #fff; transition: color 0.15s ease; }
+.action-text { color: #fff; transition: color 0.15s ease; }
+button:hover .action-icon { color: #000; }
+button:hover .action-text { color: #000; }
