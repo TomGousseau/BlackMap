@@ -94,22 +94,42 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
 
               {/* Action buttons */}
               <div className="px-6 pb-5 grid grid-cols-4 gap-3">
-                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#d4af37" }}>
+                <motion.button 
+                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                  style={{ background: "#d4af37" }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(212,175,55,0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Navigation size={18} style={{ color: "#000" }} />
                   <span className="text-[11px] font-semibold" style={{ color: "#000" }}>Directions</span>
-                </button>
-                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
+                </motion.button>
+                <motion.button 
+                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                  style={{ background: "#232326" }}
+                  whileHover={{ scale: 1.05, background: "#2a2a2e" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Globe size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Website</span>
-                </button>
-                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
+                </motion.button>
+                <motion.button 
+                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                  style={{ background: "#232326" }}
+                  whileHover={{ scale: 1.05, background: "#2a2a2e" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Share size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Share</span>
-                </button>
-                <button className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl" style={{ background: "#232326" }}>
+                </motion.button>
+                <motion.button 
+                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                  style={{ background: "#232326" }}
+                  whileHover={{ scale: 1.05, background: "#2a2a2e" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Bookmark size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-medium" style={{ color: "#fff" }}>Save</span>
-                </button>
+                </motion.button>
               </div>
 
               {/* Divider */}
@@ -117,9 +137,9 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
 
               {/* About */}
               {location.description && (
-                <div className="px-6 py-5">
-                  <h3 className="text-[12px] font-semibold tracking-wider mb-3" style={{ color: "#8e8e93" }}>ABOUT</h3>
-                  <p className="text-[14px] leading-[1.6]" style={{ color: "#c7c7cc" }}>
+                <div className="px-6 py-7">
+                  <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
+                  <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                     {location.description}
                   </p>
                 </div>
