@@ -9,6 +9,7 @@ export interface LocationData {
   imageUrl?: string;
   description?: string;
   featured?: boolean;
+  important?: boolean; // Purple pin - for future use
   views?: number;
 }
 

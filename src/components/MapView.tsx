@@ -25,6 +25,7 @@ function createMarkerIcon(color: string) {
 const goldIcon = createMarkerIcon("#c8a84e");
 const blueIcon = createMarkerIcon("#0a84ff");
 const redIcon = createMarkerIcon("#ff3b30");
+const purpleIcon = createMarkerIcon("#af52de"); // Important - unused for now
 
 // Minimum zoom level to show markers when there are 200+ locations
 const MIN_ZOOM_FOR_MARKERS = 8;
@@ -116,6 +117,7 @@ function ZoomAwareMarkers({
         const isSaved = savedLocationIds.has(loc.id);
         let icon = blueIcon;
         if (isSaved) icon = redIcon;
+        else if (loc.important) icon = purpleIcon;
         else if (loc.featured) icon = goldIcon;
         
         return (
