@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Navigation, Globe, Share, Bookmark, Send } from "lucide-react";
+import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send } from "lucide-react";
 import type { LocationData, ReviewData } from "@/lib/types";
 
 interface PlaceDetailProps {
   location: LocationData | null;
   onClose: () => void;
   onAddReview?: (locId: string, review: ReviewData) => void;
+  onSave?: (locId: string) => void;
+  isSaved?: boolean;
 }
 
-export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps) {
+export function PlaceDetail({ location, onClose, onAddReview, onSave, isSaved }: PlaceDetailProps) {
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
@@ -123,12 +125,17 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
                 </motion.button>
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: "#232326" }}
+                  style={{ background: isSaved ? "#d4af37" : "#232326" }}
                   whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => location && onSave?.(location.id)}
                 >
-                  <Bookmark size={18} className="action-icon" />
-                  <span className="text-[11px] font-medium action-text">Save</span>
+                  {isSaved ? (
+                    <BookmarkCheck size={18} style={{ color: "#000" }} />
+                  ) : (
+                    <Bookmark size={18} className="action-icon" />
+                  )}
+                  <span className="text-[11px] font-medium" style={{ color: isSaved ? "#000" : undefined }}>{isSaved ? "Saved" : "Save"}</span>
                 </motion.button>
               </div>
 

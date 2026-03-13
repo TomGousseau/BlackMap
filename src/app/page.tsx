@@ -35,6 +35,7 @@ export default function HomePage() {
   const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
   const [showAddBusiness, setShowAddBusiness] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessProfile | null>(null);
+  const [savedLocationIds, setSavedLocationIds] = useState<Set<string>>(new Set());
 
   // Lenis smooth scroll
   useEffect(() => {
@@ -77,6 +78,20 @@ export default function HomePage() {
     showStatus(`"${loc.name}" added!`);
     setCenter([loc.lat, loc.lng]);
     setZoom(14);
+  }, [showStatus]);
+
+  const handleToggleSaveLocation = useCallback((locId: string) => {
+    setSavedLocationIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(locId)) {
+        newSet.delete(locId);
+        showStatus("Location unsaved");
+      } else {
+        newSet.add(locId);
+        showStatus("Location saved!");
+      }
+      return newSet;
+    });
   }, [showStatus]);
 
   const handleSaveBusiness = useCallback((biz: BusinessProfile) => {
@@ -160,6 +175,7 @@ export default function HomePage() {
           onMapClick={handleMapClick}
           devMode={devMode}
           addingLocation={addingLocation}
+          savedLocationIds={savedLocationIds}
         />
       </div>
 
@@ -250,6 +266,8 @@ export default function HomePage() {
         location={selectedLocation}
         onClose={() => setSelectedLocation(null)}
         onAddReview={handleAddLocationReview}
+        onSave={handleToggleSaveLocation}
+        isSaved={selectedLocation ? savedLocationIds.has(selectedLocation.id) : false}
       />
 
       {/* Add location modal */}

@@ -37,6 +37,7 @@ interface MapViewProps {
   onMapClick?: (lat: number, lng: number) => void;
   devMode?: boolean;
   addingLocation?: boolean;
+  savedLocationIds?: Set<string>;
 }
 
 function MapEvents({ onMapClick, addingLocation }: { onMapClick?: (lat: number, lng: number) => void; addingLocation?: boolean }) {
@@ -72,11 +73,13 @@ function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }
 function ZoomAwareMarkers({ 
   locations, 
   onLocationClick, 
-  requireZoom 
+  requireZoom,
+  savedLocationIds 
 }: { 
   locations: LocationData[]; 
   onLocationClick?: (loc: LocationData) => void;
   requireZoom: boolean;
+  savedLocationIds: Set<string>;
 }) {
   const map = useMap();
   const [currentZoom, setCurrentZoom] = useState(map.getZoom());
@@ -93,13 +96,19 @@ function ZoomAwareMarkers({
   });
 
   // Filter locations: if requireZoom is true, only show when zoomed in enough and in viewport
+  // BUT always show saved locations regardless of zoom
   const visibleLocations = useMemo(() => {
     if (!requireZoom) return locations;
-    if (currentZoom < MIN_ZOOM_FOR_MARKERS) return [];
     
-    // Only show locations within current viewport
-    return locations.filter(loc => bounds.contains([loc.lat, loc.lng]));
-  }, [locations, requireZoom, currentZoom, bounds]);
+    // Always show saved locations + locations in viewport when zoomed in
+    return locations.filter(loc => {
+      // Always show saved locations
+      if (savedLocationIds.has(loc.id)) return true;
+      // Show others only when zoomed in enough and in viewport
+      if (currentZoom < MIN_ZOOM_FOR_MARKERS) return false;
+      return bounds.contains([loc.lat, loc.lng]);
+    });
+  }, [locations, requireZoom, currentZoom, bounds, savedLocationIds]);
 
   return (
     <>
@@ -148,6 +157,7 @@ export function MapView({
   onMapClick,
   devMode,
   addingLocation,
+  savedLocationIds = new Set(),
 }: MapViewProps) {
   // Check once if we need zoom-to-reveal mode (200+ locations)
   // Empty deps = only checked on first render
@@ -180,7 +190,8 @@ export function MapView({
       <ZoomAwareMarkers 
         locations={locations} 
         onLocationClick={onLocationClick} 
-        requireZoom={requireZoom} 
+        requireZoom={requireZoom}
+        savedLocationIds={savedLocationIds}
       />
     </MapContainer>
   );
