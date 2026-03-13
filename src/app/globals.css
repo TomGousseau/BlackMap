@@ -143,20 +143,6 @@ html, body {
 .leaflet-tile-container {
   background: #1a1a1d !important;
 }
-
-/* Map markers - fade in on hover */
-.map-marker {
-  opacity: 0;
-  transition: opacity 0.25s ease-out, transform 0.2s ease-out !important;
-}
-.map-marker:hover {
-  opacity: 1 !important;
-  transform: scale(1.1);
-}
-.leaflet-marker-icon:hover .map-marker,
-.leaflet-marker-pane:hover .map-marker {
-  opacity: 1 !important;
-}
 .leaflet-fade-anim .leaflet-tile {
   will-change: opacity !important;
 }
