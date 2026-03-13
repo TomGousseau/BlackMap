@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send } from "lucide-react";
 import type { LocationData, ReviewData } from "@/lib/types";
@@ -19,6 +19,16 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, i
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!location) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [location, onClose]);
 
   const canSubmit = reviewAuthor.trim() && reviewText.trim() && reviewRating > 0;
 
