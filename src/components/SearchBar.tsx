@@ -48,121 +48,104 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
   };
 
   return (
-    <div ref={containerRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
-      <form onSubmit={handleSubmit}>
-        <div
-          className="relative rounded-2xl overflow-visible"
-          style={{
-            background: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            boxShadow: focused
-              ? "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)"
-              : "0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)",
-            transition: "box-shadow 0.2s ease",
-          }}
-        >
-          <div className="flex items-center px-4 py-3">
-            <Search size={18} style={{ color: "#8e8e93" }} className="shrink-0" />
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search Maps"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setFocused(true)}
-              className="flex-1 ml-3 text-[15px] bg-transparent outline-none placeholder:text-[#8e8e93]"
-              style={{ color: "#1c1c1e" }}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-                className="w-[18px] h-[18px] rounded-full flex items-center justify-center cursor-pointer shrink-0"
-                style={{ background: "#c7c7cc" }}
-              >
-                <X size={10} style={{ color: "#fff" }} strokeWidth={3} />
-              </button>
-            )}
-          </div>
-        </div>
-      </form>
-
+    <div ref={containerRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4">
+      {/* Apple Maps style search card */}
       <AnimatePresence>
-        {showDropdown && (
+        {focused ? (
           <motion.div
-            className="rounded-2xl mt-2 overflow-hidden"
+            className="rounded-2xl overflow-hidden"
             style={{
-              background: "rgba(255,255,255,0.98)",
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
+              background: "#fff",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
             }}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
           >
-            <div className="max-h-[320px] overflow-y-auto" data-lenis-prevent>
-              {/* Search results */}
-              {query.trim() && filtered.length > 0 && (
+            {/* Header with Search label and X */}
+            <div className="flex items-center justify-between px-4 pt-3 pb-2">
+              <span className="text-[17px] font-semibold" style={{ color: "#000" }}>Search</span>
+              <button
+                onClick={() => { setFocused(false); setQuery(""); }}
+                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                style={{ background: "#e5e5ea" }}
+              >
+                <X size={16} style={{ color: "#3c3c43" }} />
+              </button>
+            </div>
+
+            {/* Search input */}
+            <form onSubmit={handleSubmit} className="px-4 pb-3">
+              <div
+                className="flex items-center rounded-xl px-3 py-2.5"
+                style={{ background: "#f2f2f7", border: "2px solid #007aff" }}
+              >
+                <Search size={16} style={{ color: "#8e8e93" }} className="shrink-0" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Apple Maps"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  autoFocus
+                  className="flex-1 ml-2 text-[15px] bg-transparent outline-none placeholder:text-[#8e8e93]"
+                  style={{ color: "#000" }}
+                />
+              </div>
+            </form>
+
+            {/* Dropdown content */}
+            <div className="max-h-[280px] overflow-y-auto border-t border-[#e5e5ea]" data-lenis-prevent>
+              {query.trim() && filtered.length > 0 ? (
                 <div className="py-1">
                   {filtered.map((loc) => (
                     <button
                       key={loc.id}
                       onClick={() => { onSelect(loc); setQuery(""); setFocused(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors"
-                      style={{ color: "#1c1c1e" }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = "#f2f2f7"}
-                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
                     >
-                      <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
-                        style={{ background: "#f2f2f7" }}>
+                      <div 
+                        className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ background: "#f2f2f7" }}
+                      >
                         {loc.imageUrl ? (
                           <img src={loc.imageUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <MapPin size={16} style={{ color: "#007aff" }} />
+                          <MapPin size={18} style={{ color: "#007aff" }} />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[15px] font-medium truncate">{loc.name}</div>
-                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>
-                          {loc.category}
-                        </div>
+                        <div className="text-[15px] font-medium truncate" style={{ color: "#000" }}>{loc.name}</div>
+                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>{loc.category}</div>
                       </div>
                     </button>
                   ))}
                 </div>
-              )}
-
-              {/* Recents */}
-              {!query.trim() && (
+              ) : (
                 <div className="py-1">
-                  <div className="px-4 py-2 text-[13px] font-semibold" style={{ color: "#8e8e93" }}>
+                  <div className="px-4 py-2 text-[13px] font-medium" style={{ color: "#8e8e93" }}>
                     Recents
                   </div>
                   {recentPlaces.map((loc) => (
                     <button
                       key={loc.id}
                       onClick={() => { onSelect(loc); setFocused(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors"
-                      style={{ color: "#1c1c1e" }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = "#f2f2f7"}
-                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
                     >
-                      <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
-                        style={{ background: "#f2f2f7" }}>
+                      <div 
+                        className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ background: "#f2f2f7" }}
+                      >
                         {loc.imageUrl ? (
                           <img src={loc.imageUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <MapPin size={16} style={{ color: "#007aff" }} />
+                          <MapPin size={18} style={{ color: "#007aff" }} />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[15px] font-medium truncate">{loc.name}</div>
-                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>
-                          {loc.category}
-                        </div>
+                        <div className="text-[15px] font-medium truncate" style={{ color: "#000" }}>{loc.name}</div>
+                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>{loc.category}</div>
                       </div>
                     </button>
                   ))}
@@ -170,6 +153,24 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
               )}
             </div>
           </motion.div>
+        ) : (
+          <motion.button
+            onClick={() => setFocused(true)}
+            className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl cursor-pointer"
+            style={{
+              background: "rgba(255,255,255,0.92)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              border: "1px solid rgba(0,0,0,0.04)",
+            }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Search size={16} style={{ color: "#8e8e93" }} />
+            <span className="text-[15px]" style={{ color: "#8e8e93" }}>Search Maps</span>
+          </motion.button>
         )}
       </AnimatePresence>
     </div>

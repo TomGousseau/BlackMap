@@ -37,131 +37,160 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
     <AnimatePresence>
       {location && (
         <motion.div
-          className="fixed top-0 left-0 bottom-0 z-50 w-full max-w-[380px]"
-          initial={{ x: "-100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "-100%" }}
+          className="fixed top-4 left-4 bottom-4 z-50 w-full max-w-[360px]"
+          initial={{ x: "-120%", opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: "-120%", opacity: 0 }}
           transition={{ type: "spring" as const, stiffness: 350, damping: 34 }}
         >
           <div
-            className="h-full flex flex-col overflow-hidden"
+            className="h-full flex flex-col overflow-hidden rounded-3xl"
             style={{
-              background: "#ffffff",
-              boxShadow: "4px 0 40px rgba(0,0,0,0.2)",
+              background: "linear-gradient(180deg, #1a1a1e 0%, #121214 100%)",
+              boxShadow: "0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)",
             }}
           >
+            {/* Gloss overlay */}
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-3xl"
+              style={{
+                background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 40%, rgba(0,0,0,0.15) 100%)",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            />
+
             {/* Image header */}
             {location.imageUrl && (
-              <div className="relative w-full h-52 shrink-0">
+              <div className="relative w-full h-48 shrink-0 rounded-t-3xl overflow-hidden">
                 <img
                   src={location.imageUrl}
                   alt={location.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #1a1a1e 0%, transparent 60%)" }} />
                 <button
                   onClick={onClose}
-                  className="absolute top-3 right-3 w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer"
-                  style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(10px)" }}
+                  className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
+                  style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)" }}
                 >
-                  <X size={14} style={{ color: "#1c1c1e" }} strokeWidth={2.5} />
+                  <X size={16} style={{ color: "#fff" }} />
                 </button>
               </div>
             )}
 
             {/* Scrollable body */}
-            <div className="flex-1 overflow-y-auto" data-lenis-prevent>
+            <div className="flex-1 overflow-y-auto relative z-10" data-lenis-prevent>
               {/* Title section */}
               <div className="px-5 pt-4 pb-3">
                 {!location.imageUrl && (
                   <div className="flex justify-end mb-2">
                     <button
                       onClick={onClose}
-                      className="w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: "#e5e5ea" }}
+                      className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
+                      style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
                     >
-                      <X size={14} style={{ color: "#3c3c43" }} strokeWidth={2.5} />
+                      <X size={16} style={{ color: "#fff" }} />
                     </button>
                   </div>
                 )}
-                <h2 className="text-[22px] font-bold leading-tight" style={{ color: "#1c1c1e" }}>
+                <h2 className="text-xl font-bold leading-tight" style={{ color: "#f5f5f7" }}>
                   {location.name}
                 </h2>
                 {location.category && (
-                  <p className="text-[13px] mt-0.5" style={{ color: "#8e8e93" }}>{location.category}</p>
+                  <p className="text-[13px] mt-1 font-medium" style={{ color: "#86868b" }}>{location.category}</p>
                 )}
               </div>
 
               {/* Action buttons row */}
               <div className="px-5 pb-4 flex gap-2">
-                <button className="flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer" style={{ background: "#007aff" }}>
-                  <Navigation size={17} style={{ color: "#fff" }} />
+                <button 
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
+                  style={{ background: "linear-gradient(135deg, #0a84ff 0%, #0070e0 100%)", boxShadow: "0 4px 12px rgba(10,132,255,0.3)" }}
+                >
+                  <Navigation size={18} style={{ color: "#fff" }} />
                   <span className="text-[11px] font-semibold" style={{ color: "#fff" }}>Directions</span>
                 </button>
-                <button className="flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer" style={{ background: "#f2f2f7" }}>
-                  <Globe size={17} style={{ color: "#007aff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#007aff" }}>Website</span>
+                <button 
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                >
+                  <Globe size={18} style={{ color: "#0a84ff" }} />
+                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Website</span>
                 </button>
-                <button className="flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer" style={{ background: "#f2f2f7" }}>
-                  <Share size={17} style={{ color: "#007aff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#007aff" }}>Share</span>
+                <button 
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                >
+                  <Share size={18} style={{ color: "#0a84ff" }} />
+                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Share</span>
                 </button>
-                <button className="flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl cursor-pointer" style={{ background: "#f2f2f7" }}>
-                  <Bookmark size={17} style={{ color: "#007aff" }} />
-                  <span className="text-[11px] font-semibold" style={{ color: "#007aff" }}>Save</span>
+                <button 
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                >
+                  <Bookmark size={18} style={{ color: "#0a84ff" }} />
+                  <span className="text-[11px] font-semibold" style={{ color: "#0a84ff" }}>Save</span>
                 </button>
               </div>
 
               {/* Info bar */}
-              <div className="mx-5 mb-4 flex items-center gap-4 px-4 py-2.5 rounded-xl" style={{ background: "#f2f2f7" }}>
+              <div 
+                className="mx-5 mb-4 flex items-center gap-4 px-4 py-3 rounded-2xl" 
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+              >
                 {location.rating != null && (
                   <div className="flex items-center gap-1.5">
-                    <Star size={14} fill="#ff9500" style={{ color: "#ff9500" }} />
-                    <span className="text-sm font-bold" style={{ color: "#1c1c1e" }}>{location.rating}</span>
+                    <Star size={14} fill="#d4af37" style={{ color: "#d4af37" }} />
+                    <span className="text-sm font-bold" style={{ color: "#f5f5f7" }}>{location.rating}</span>
                   </div>
                 )}
                 {location.views != null && location.views > 0 && (
                   <div className="flex items-center gap-1">
-                    <Eye size={13} style={{ color: "#8e8e93" }} />
-                    <span className="text-xs font-medium" style={{ color: "#8e8e93" }}>{(location.views / 1000).toFixed(1)}k</span>
+                    <Eye size={13} style={{ color: "#86868b" }} />
+                    <span className="text-xs font-medium" style={{ color: "#86868b" }}>{(location.views / 1000).toFixed(1)}k</span>
                   </div>
                 )}
                 {location.featured && (
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(212,175,55,0.15)", color: "#b8860b" }}>Featured</span>
+                  <span 
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded-full" 
+                    style={{ background: "rgba(212,175,55,0.15)", color: "#d4af37", border: "1px solid rgba(212,175,55,0.2)" }}
+                  >
+                    Featured
+                  </span>
                 )}
               </div>
 
-              <div className="h-px mx-5" style={{ background: "#e5e5ea" }} />
+              <div className="h-px mx-5" style={{ background: "rgba(255,255,255,0.06)" }} />
 
               {/* About */}
               {location.description && (
                 <div className="px-5 py-4">
-                  <h3 className="text-[15px] font-bold mb-2" style={{ color: "#1c1c1e" }}>About</h3>
-                  <div className="rounded-xl p-3.5" style={{ background: "#f2f2f7" }}>
-                    <p className="text-[13px] leading-[1.65]" style={{ color: "#3c3c43" }}>{location.description}</p>
+                  <h3 className="text-[13px] font-bold mb-2 tracking-wide" style={{ color: "#86868b" }}>ABOUT</h3>
+                  <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-[13px] leading-relaxed" style={{ color: "#a1a1a6" }}>{location.description}</p>
                   </div>
                 </div>
               )}
 
-              <div className="h-px mx-5" style={{ background: "#e5e5ea" }} />
+              <div className="h-px mx-5" style={{ background: "rgba(255,255,255,0.06)" }} />
 
               {/* Ratings & Reviews */}
               <div className="px-5 py-4">
-                <h3 className="text-[15px] font-bold mb-3" style={{ color: "#1c1c1e" }}>Ratings &amp; Reviews</h3>
+                <h3 className="text-[13px] font-bold mb-3 tracking-wide" style={{ color: "#86868b" }}>RATINGS & REVIEWS</h3>
 
                 {location.rating != null && (
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-4xl font-bold" style={{ color: "#1c1c1e" }}>{location.rating}</span>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-4xl font-bold" style={{ color: "#f5f5f7" }}>{location.rating}</span>
                     <div>
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star key={s} size={14}
-                            fill={s <= Math.round(location.rating!) ? "#ff9500" : "transparent"}
-                            style={{ color: s <= Math.round(location.rating!) ? "#ff9500" : "#d1d1d6" }}
+                            fill={s <= Math.round(location.rating!) ? "#d4af37" : "transparent"}
+                            style={{ color: s <= Math.round(location.rating!) ? "#d4af37" : "#3a3a3c" }}
                           />
                         ))}
                       </div>
-                      <span className="text-[11px]" style={{ color: "#8e8e93" }}>
+                      <span className="text-[11px] font-medium" style={{ color: "#86868b" }}>
                         {(location.reviews?.length || 0)} review{(location.reviews?.length || 0) !== 1 ? "s" : ""}
                       </span>
                     </div>
@@ -172,20 +201,24 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
                 {location.reviews && location.reviews.length > 0 && (
                   <div className="space-y-2.5 mb-4">
                     {location.reviews.map((r) => (
-                      <div key={r.id} className="p-3.5 rounded-xl" style={{ background: "#f2f2f7" }}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[13px] font-semibold" style={{ color: "#1c1c1e" }}>{r.author}</span>
+                      <div 
+                        key={r.id} 
+                        className="p-4 rounded-2xl" 
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[13px] font-semibold" style={{ color: "#f5f5f7" }}>{r.author}</span>
                           <div className="flex items-center gap-0.5">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star key={i} size={10}
-                                fill={i < r.rating ? "#ff9500" : "transparent"}
-                                style={{ color: i < r.rating ? "#ff9500" : "#d1d1d6" }}
+                                fill={i < r.rating ? "#d4af37" : "transparent"}
+                                style={{ color: i < r.rating ? "#d4af37" : "#3a3a3c" }}
                               />
                             ))}
                           </div>
                         </div>
-                        <p className="text-[13px] leading-[1.5]" style={{ color: "#3c3c43" }}>{r.text}</p>
-                        <span className="text-[11px] mt-1.5 block" style={{ color: "#aeaeb2" }}>{r.date}</span>
+                        <p className="text-[13px] leading-relaxed" style={{ color: "#a1a1a6" }}>{r.text}</p>
+                        <span className="text-[11px] mt-2 block font-medium" style={{ color: "#48484a" }}>{r.date}</span>
                       </div>
                     ))}
                   </div>
@@ -193,18 +226,18 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
 
                 {/* Write a review */}
                 {onAddReview && (
-                  <div className="rounded-xl p-3.5" style={{ background: "#f2f2f7" }}>
-                    <p className="text-[12px] font-semibold mb-2" style={{ color: "#8e8e93" }}>Write a Review</p>
-                    <div className="flex items-center gap-1 mb-2">
+                  <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-[11px] font-bold tracking-wide mb-3" style={{ color: "#86868b" }}>WRITE A REVIEW</p>
+                    <div className="flex items-center gap-1.5 mb-3">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <button key={s} className="cursor-pointer"
+                        <button key={s} className="cursor-pointer transition-transform duration-150 hover:scale-110"
                           onMouseEnter={() => setHoverRating(s)}
                           onMouseLeave={() => setHoverRating(0)}
                           onClick={() => setReviewRating(s)}
                         >
-                          <Star size={16}
-                            fill={s <= (hoverRating || reviewRating) ? "#ff9500" : "transparent"}
-                            style={{ color: s <= (hoverRating || reviewRating) ? "#ff9500" : "#d1d1d6", transition: "color 0.15s" }}
+                          <Star size={20}
+                            fill={s <= (hoverRating || reviewRating) ? "#d4af37" : "transparent"}
+                            style={{ color: s <= (hoverRating || reviewRating) ? "#d4af37" : "#3a3a3c", transition: "color 0.15s" }}
                           />
                         </button>
                       ))}
@@ -214,8 +247,8 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
                       value={reviewAuthor}
                       onChange={(e) => setReviewAuthor(e.target.value)}
                       placeholder="Your name"
-                      className="w-full py-2 px-3 rounded-lg text-xs outline-none mb-2"
-                      style={{ background: "#fff", color: "#1c1c1e", border: "1px solid #e5e5ea" }}
+                      className="w-full py-3 px-4 rounded-xl text-[13px] font-medium outline-none mb-2 transition-all duration-200 focus:ring-2 focus:ring-[#d4af37]/30"
+                      style={{ background: "rgba(255,255,255,0.06)", color: "#f5f5f7", border: "1px solid rgba(255,255,255,0.08)" }}
                     />
                     <div className="flex gap-2">
                       <input
@@ -223,17 +256,22 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
                         value={reviewText}
                         onChange={(e) => setReviewText(e.target.value)}
                         placeholder="Write your review..."
-                        className="flex-1 py-2 px-3 rounded-lg text-xs outline-none"
-                        style={{ background: "#fff", color: "#1c1c1e", border: "1px solid #e5e5ea" }}
+                        className="flex-1 py-3 px-4 rounded-xl text-[13px] font-medium outline-none transition-all duration-200 focus:ring-2 focus:ring-[#d4af37]/30"
+                        style={{ background: "rgba(255,255,255,0.06)", color: "#f5f5f7", border: "1px solid rgba(255,255,255,0.08)" }}
                         onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
                       />
                       <button
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer"
-                        style={{ background: canSubmit ? "#007aff" : "#e5e5ea", opacity: canSubmit ? 1 : 0.5 }}
+                        className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
+                        style={{ 
+                          background: canSubmit ? "linear-gradient(135deg, #d4af37 0%, #c8a035 100%)" : "rgba(255,255,255,0.06)", 
+                          opacity: canSubmit ? 1 : 0.4,
+                          boxShadow: canSubmit ? "0 4px 16px rgba(212,175,55,0.3)" : "none",
+                          border: canSubmit ? "none" : "1px solid rgba(255,255,255,0.08)",
+                        }}
                       >
-                        <Send size={14} style={{ color: canSubmit ? "#fff" : "#8e8e93" }} />
+                        <Send size={16} style={{ color: canSubmit ? "#000" : "#6e6e73" }} />
                       </button>
                     </div>
                   </div>
