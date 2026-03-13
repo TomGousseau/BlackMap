@@ -69,7 +69,7 @@ export function BusinessProfileButton({
             transition={{ type: "spring" as const, stiffness: 400, damping: 28 }}
           >
             {/* Header */}
-            <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+            <div className="pl-5 pr-4 pt-4 pb-2 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold gold-text">Business Profiles</h3>
                 <p className="text-[11px] mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
