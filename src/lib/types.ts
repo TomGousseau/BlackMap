@@ -11,6 +11,7 @@ export interface LocationData {
   featured?: boolean;
   important?: boolean; // Purple pin - for future use
   ownerId?: string; // Owner cannot review their own business
+  createdAt?: string; // ISO timestamp - can delete within 10 min
   views?: number;
 }
 

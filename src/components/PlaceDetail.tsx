@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send } from "lucide-react";
+import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send, Trash2 } from "lucide-react";
 import type { LocationData, ReviewData } from "@/lib/types";
 
 interface PlaceDetailProps {
@@ -11,15 +11,45 @@ interface PlaceDetailProps {
   onAddReview?: (locId: string, review: ReviewData) => void;
   onSave?: (locId: string) => void;
   onShare?: (locId: string) => void;
+  onDelete?: (locId: string) => void;
   isSaved?: boolean;
   currentUserId?: string; // Hide review form if user owns this location
 }
 
-export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, isSaved, currentUserId }: PlaceDetailProps) {
+export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, onDelete, isSaved, currentUserId }: PlaceDetailProps) {
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  // Check if owner can still delete (within 10 min)
+  const isOwner = currentUserId && location?.ownerId === currentUserId;
+  
+  useEffect(() => {
+    if (!location?.createdAt || !isOwner) {
+      setTimeLeft(null);
+      return;
+    }
+    
+    const checkTime = () => {
+      const created = new Date(location.createdAt!).getTime();
+      const now = Date.now();
+      const elapsed = now - created;
+      const tenMinutes = 10 * 60 * 1000;
+      const remaining = tenMinutes - elapsed;
+      
+      if (remaining > 0) {
+        setTimeLeft(Math.ceil(remaining / 1000));
+      } else {
+        setTimeLeft(null);
+      }
+    };
+    
+    checkTime();
+    const interval = setInterval(checkTime, 1000);
+    return () => clearInterval(interval);
+  }, [location?.createdAt, isOwner]);
 
   // Close on Escape key
   useEffect(() => {
@@ -151,6 +181,24 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, i
                   <span className="text-[11px] font-medium" style={{ color: isSaved ? "#000" : undefined }}>{isSaved ? "Saved" : "Save"}</span>
                 </motion.button>
               </div>
+
+              {/* Delete button - only for owner within 10 min */}
+              {isOwner && timeLeft !== null && onDelete && (
+                <div className="px-6 pb-4">
+                  <motion.button
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer"
+                    style={{ background: "#3a1a1a" }}
+                    whileHover={{ scale: 1.02, background: "#ff3b30" }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onDelete(location.id)}
+                  >
+                    <Trash2 size={16} style={{ color: "#ff6961" }} />
+                    <span className="text-[13px] font-medium" style={{ color: "#ff6961" }}>
+                      Delete ({Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")} left)
+                    </span>
+                  </motion.button>
+                </div>
+              )}
 
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-6 mb-6" style={{ background: "#2a2a2e" }} />
