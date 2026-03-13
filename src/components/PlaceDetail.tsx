@@ -152,7 +152,7 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               <div className="px-6 py-5">
                 <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RATINGS & REVIEWS</h3>
 
-                {location.rating != null && (
+                {location.rating != null && (location.reviews?.length || 0) > 0 ? (
                   <div className="flex items-center gap-4 mb-5">
                     <span className="text-[44px] font-bold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>{location.rating}</span>
                     <div>
@@ -169,6 +169,8 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
                       </span>
                     </div>
                   </div>
+                ) : (
+                  <span className="text-[13px]" style={{ color: "#8e8e93" }}>Unreviewed</span>
                 )}
 
                 {/* Existing reviews */}
