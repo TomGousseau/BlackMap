@@ -12,9 +12,10 @@ interface PlaceDetailProps {
   onSave?: (locId: string) => void;
   onShare?: (locId: string) => void;
   isSaved?: boolean;
+  currentUserId?: string; // Hide review form if user owns this location
 }
 
-export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, isSaved }: PlaceDetailProps) {
+export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, isSaved, currentUserId }: PlaceDetailProps) {
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
@@ -216,8 +217,8 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, i
                 )}
               </div>
 
-              {/* Write Review - separate section */}
-              {onAddReview && (
+              {/* Write Review - separate section (hidden if viewing own business) */}
+              {onAddReview && !(currentUserId && location.ownerId === currentUserId) && (
                 <>
                   <div className="h-[1px] mx-6 mt-6 mb-6" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-6">

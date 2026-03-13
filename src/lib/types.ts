@@ -10,6 +10,7 @@ export interface LocationData {
   description?: string;
   featured?: boolean;
   important?: boolean; // Purple pin - for future use
+  ownerId?: string; // Owner cannot review their own business
   views?: number;
 }
 
