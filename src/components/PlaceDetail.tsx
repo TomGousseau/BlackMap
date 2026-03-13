@@ -133,12 +133,12 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               </div>
 
               {/* Divider */}
-              <div className="h-[1px] mx-6 mt-3 mb-1" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 mt-6 mb-6" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
-                <div className="px-6 py-6">
-                  <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
+                <div className="px-6 py-4">
+                  <h3 className="text-[12px] font-semibold tracking-wider mb-3" style={{ color: "#8e8e93" }}>ABOUT</h3>
                   <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                     {location.description}
                   </p>
@@ -146,7 +146,7 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               )}
 
               {/* Divider */}
-              <div className="h-[1px] mx-6 mt-1 mb-1" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 mt-6 mb-6" style={{ background: "#2a2a2e" }} />
 
               {/* Ratings & Reviews */}
               <div className="px-6 py-6">
@@ -200,7 +200,7 @@ export function PlaceDetail({ location, onClose, onAddReview }: PlaceDetailProps
               {/* Write Review - separate section */}
               {onAddReview && (
                 <>
-                  <div className="h-[1px] mx-6 mt-1 mb-1" style={{ background: "#2a2a2e" }} />
+                  <div className="h-[1px] mx-6 mt-6 mb-6" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-6">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
                     
