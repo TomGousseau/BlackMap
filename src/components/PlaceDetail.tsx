@@ -264,7 +264,7 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               )}
 
               {/* Divider - more space below buttons */}
-              <div className="h-[1px] mx-6 mt-2 mb-4" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 mt-6 mb-4" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
