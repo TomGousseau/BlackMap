@@ -200,7 +200,7 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               </div>
 
               {/* Action buttons */}
-              <div className="px-6 pb-5 grid grid-cols-4 gap-3">
+              <div className="px-6 pb-8 grid grid-cols-4 gap-3">
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#232326" }}
