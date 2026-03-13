@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { LocationData } from "@/lib/types";
@@ -25,6 +25,9 @@ function createMarkerIcon(isGold = false) {
 
 const goldIcon = createMarkerIcon(true);
 const blueIcon = createMarkerIcon(false);
+
+// Minimum zoom level to show markers when there are 200+ locations
+const MIN_ZOOM_FOR_MARKERS = 8;
 
 interface MapViewProps {
   center: [number, number];
@@ -65,40 +68,42 @@ function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }
   return null;
 }
 
-export function MapView({
-  center,
-  zoom,
-  locations,
-  onLocationClick,
-  onMapClick,
-  devMode,
-  addingLocation,
-}: MapViewProps) {
+// Component to track zoom and bounds, filter visible markers
+function ZoomAwareMarkers({ 
+  locations, 
+  onLocationClick, 
+  requireZoom 
+}: { 
+  locations: LocationData[]; 
+  onLocationClick?: (loc: LocationData) => void;
+  requireZoom: boolean;
+}) {
+  const map = useMap();
+  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
+  const [bounds, setBounds] = useState(map.getBounds());
+
+  useMapEvents({
+    zoomend: () => {
+      setCurrentZoom(map.getZoom());
+      setBounds(map.getBounds());
+    },
+    moveend: () => {
+      setBounds(map.getBounds());
+    },
+  });
+
+  // Filter locations: if requireZoom is true, only show when zoomed in enough and in viewport
+  const visibleLocations = useMemo(() => {
+    if (!requireZoom) return locations;
+    if (currentZoom < MIN_ZOOM_FOR_MARKERS) return [];
+    
+    // Only show locations within current viewport
+    return locations.filter(loc => bounds.contains([loc.lat, loc.lng]));
+  }, [locations, requireZoom, currentZoom, bounds]);
+
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      className="w-full h-full"
-      zoomControl={false}
-      attributionControl={false}
-      preferCanvas={true}
-      zoomAnimation={true}
-      markerZoomAnimation={true}
-      minZoom={3}
-      maxBounds={[[-85, -180], [85, 180]]}
-      maxBoundsViscosity={1.0}
-      style={{ cursor: addingLocation ? "crosshair" : "grab", background: "#1a1a1d" }}
-    >
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        maxZoom={19}
-        keepBuffer={8}
-        updateWhenZooming={false}
-        updateWhenIdle={false}
-      />
-      <ChangeView center={center} zoom={zoom} />
-      <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} />
-      {locations.map((loc) => (
+    <>
+      {visibleLocations.map((loc) => (
         <Marker
           key={loc.id}
           position={[loc.lat, loc.lng]}
@@ -131,6 +136,52 @@ export function MapView({
           </Popup>
         </Marker>
       ))}
+    </>
+  );
+}
+
+export function MapView({
+  center,
+  zoom,
+  locations,
+  onLocationClick,
+  onMapClick,
+  devMode,
+  addingLocation,
+}: MapViewProps) {
+  // Check once if we need zoom-to-reveal mode (200+ locations)
+  // Empty deps = only checked on first render
+  const [requireZoom] = useState(() => locations.length >= 200);
+
+  return (
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      className="w-full h-full"
+      zoomControl={false}
+      attributionControl={false}
+      preferCanvas={true}
+      zoomAnimation={true}
+      markerZoomAnimation={true}
+      minZoom={3}
+      maxBounds={[[-85, -180], [85, 180]]}
+      maxBoundsViscosity={1.0}
+      style={{ cursor: addingLocation ? "crosshair" : "grab", background: "#1a1a1d" }}
+    >
+      <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        maxZoom={19}
+        keepBuffer={8}
+        updateWhenZooming={false}
+        updateWhenIdle={false}
+      />
+      <ChangeView center={center} zoom={zoom} />
+      <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} />
+      <ZoomAwareMarkers 
+        locations={locations} 
+        onLocationClick={onLocationClick} 
+        requireZoom={requireZoom} 
+      />
     </MapContainer>
   );
 }
