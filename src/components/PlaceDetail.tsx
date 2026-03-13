@@ -200,7 +200,7 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               </div>
 
               {/* Action buttons */}
-              <div className="px-6 pb-8 grid grid-cols-4 gap-3">
+              <div className="px-6 pb-5 grid grid-cols-4 gap-3">
                 <motion.button 
                   className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
                   style={{ background: "#232326" }}
@@ -263,13 +263,13 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
                 </div>
               )}
 
-              {/* Divider - more space below buttons */}
-              <div className="h-[1px] mx-6 mt-6 mb-4" style={{ background: "#2a2a2e" }} />
+              {/* Divider */}
+              <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
               {/* About */}
               {location.description && (
-                <div className="px-6 pb-4">
-                  <h3 className="text-[12px] font-semibold tracking-wider mb-3" style={{ color: "#8e8e93" }}>ABOUT</h3>
+                <div className="px-6 py-5">
+                  <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
                   <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                     {location.description}
                   </p>
@@ -277,10 +277,10 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               )}
 
               {/* Divider */}
-              <div className="h-[1px] mx-6 mt-2 mb-4" style={{ background: "#2a2a2e" }} />
+              <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
               {/* Ratings & Reviews */}
-              <div className="px-6 py-4">
+              <div className="px-6 py-5">
                 <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RATINGS & REVIEWS</h3>
 
                 {location.rating != null && (location.reviews?.length || 0) > 0 ? (
@@ -331,8 +331,8 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               {/* Write Review - separate section (hidden if viewing own business) */}
               {onAddReview && !(currentUserId && location.ownerId === currentUserId) && (
                 <>
-                  <div className="h-[1px] mx-6 mt-2 mb-4" style={{ background: "#2a2a2e" }} />
-                  <div className="px-6 py-4">
+                  <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
+                  <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-5" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
                     
                     {/* Star picker */}
