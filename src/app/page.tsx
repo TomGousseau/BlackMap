@@ -150,13 +150,15 @@ export default function HomePage() {
       prev.map((l) => {
         if (l.id !== locId) return l;
         const newReviews = [...(l.reviews || []), review];
-        return { ...l, reviews: newReviews };
+        const avgRating = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
+        return { ...l, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
       })
     );
     setSelectedLocation((prev) => {
       if (!prev || prev.id !== locId) return prev;
       const newReviews = [...(prev.reviews || []), review];
-      return { ...prev, reviews: newReviews };
+      const avgRating = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
+      return { ...prev, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
     });
     showStatus("Review added!");
   }, [showStatus]);
