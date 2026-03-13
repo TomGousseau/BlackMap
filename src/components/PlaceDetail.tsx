@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send, Trash2 } from "lucide-react";
+import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { LocationData, ReviewData } from "@/lib/types";
 
 interface PlaceDetailProps {
@@ -22,6 +22,26 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Get all images (combine imageUrl and imageUrls for backward compatibility)
+  const allImages = location ? [
+    ...(location.imageUrl ? [location.imageUrl] : []),
+    ...(location.imageUrls || []),
+  ].filter((url, index, arr) => arr.indexOf(url) === index) : []; // Remove duplicates
+
+  // Reset image index when location changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [location?.id]);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   // Check if owner can still delete (within 10 min)
   const isOwner = currentUserId && location?.ownerId === currentUserId;
@@ -94,15 +114,58 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
               boxShadow: "0 25px 80px rgba(0,0,0,0.8)",
             }}
           >
-            {/* Image header */}
-            {location.imageUrl && (
+            {/* Image header with gallery */}
+            {allImages.length > 0 && (
               <div className="relative w-full h-44 shrink-0">
-                <img
-                  src={location.imageUrl}
-                  alt={location.name}
-                  className="w-full h-full object-cover"
-                />
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentImageIndex}
+                    src={allImages[currentImageIndex]}
+                    alt={location.name}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </AnimatePresence>
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #161618 0%, transparent 70%)" }} />
+                
+                {/* Navigation arrows */}
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)" }}
+                    >
+                      <ChevronLeft size={18} style={{ color: "#fff" }} />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-14 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)" }}
+                    >
+                      <ChevronRight size={18} style={{ color: "#fff" }} />
+                    </button>
+                    
+                    {/* Dots indicator */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {allImages.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentImageIndex(idx)}
+                          className="w-1.5 h-1.5 rounded-full cursor-pointer"
+                          style={{ 
+                            background: idx === currentImageIndex ? "#fff" : "rgba(255,255,255,0.4)",
+                            transition: "background 0.2s ease"
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+                
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
@@ -117,7 +180,7 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
             <div className="flex-1 overflow-y-auto" data-lenis-prevent>
               {/* Title */}
               <div className="px-6 pt-5 pb-4">
-                {!location.imageUrl && (
+                {allImages.length === 0 && (
                   <div className="flex justify-end mb-3">
                     <button
                       onClick={onClose}

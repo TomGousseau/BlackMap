@@ -7,6 +7,7 @@ export interface LocationData {
   rating?: number;
   reviews?: ReviewData[];
   imageUrl?: string;
+  imageUrls?: string[]; // Multiple images - for gallery
   description?: string;
   featured?: boolean;
   important?: boolean; // Purple pin - for future use
