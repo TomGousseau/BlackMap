@@ -92,9 +92,9 @@ export function MapView({
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         maxZoom={19}
-        keepBuffer={6}
+        keepBuffer={8}
         updateWhenZooming={false}
-        updateWhenIdle={true}
+        updateWhenIdle={false}
       />
       <ChangeView center={center} zoom={zoom} />
       <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} />

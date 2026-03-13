@@ -121,12 +121,24 @@ html, body {
 .leaflet-container {
   background: #1a1a1d !important;
 }
-.leaflet-tile {
+.leaflet-tile-container {
   background: #1a1a1d !important;
-  transition: opacity 0.3s ease-out !important;
+}
+.leaflet-tile {
+  background: transparent !important;
+  filter: none !important;
+}
+.leaflet-tile-loaded {
+  transition: opacity 0.35s ease-out !important;
 }
 .leaflet-tile-pane {
   background: #1a1a1d !important;
+}
+.leaflet-fade-anim .leaflet-popup {
+  transition: opacity 0.2s ease-out !important;
+}
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
 }
 .leaflet-tile-container {
   background: #1a1a1d !important;
