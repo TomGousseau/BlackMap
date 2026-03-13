@@ -43,6 +43,22 @@ export default function HomePage() {
     return () => lenis.destroy();
   }, []);
 
+  // Check URL for shared location on load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const locId = params.get("loc");
+    if (locId) {
+      const loc = locations.find(l => l.id === locId);
+      if (loc) {
+        setCenter([loc.lat, loc.lng]);
+        setZoom(14);
+        setSelectedLocation(loc);
+        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    }
+  }, []);
+
   const showStatus = useCallback((msg: string) => {
     setStatusMessage(msg);
     setTimeout(() => setStatusMessage(null), 2500);
@@ -91,6 +107,15 @@ export default function HomePage() {
         showStatus("Location saved!");
       }
       return newSet;
+    });
+  }, [showStatus]);
+
+  const handleShareLocation = useCallback((locId: string) => {
+    const url = `${window.location.origin}${window.location.pathname}?loc=${locId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showStatus("Link copied!");
+    }).catch(() => {
+      showStatus("Failed to copy link");
     });
   }, [showStatus]);
 
@@ -267,6 +292,7 @@ export default function HomePage() {
         onClose={() => setSelectedLocation(null)}
         onAddReview={handleAddLocationReview}
         onSave={handleToggleSaveLocation}
+        onShare={handleShareLocation}
         isSaved={selectedLocation ? savedLocationIds.has(selectedLocation.id) : false}
       />
 

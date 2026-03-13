@@ -10,10 +10,11 @@ interface PlaceDetailProps {
   onClose: () => void;
   onAddReview?: (locId: string, review: ReviewData) => void;
   onSave?: (locId: string) => void;
+  onShare?: (locId: string) => void;
   isSaved?: boolean;
 }
 
-export function PlaceDetail({ location, onClose, onAddReview, onSave, isSaved }: PlaceDetailProps) {
+export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, isSaved }: PlaceDetailProps) {
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
@@ -119,6 +120,7 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, isSaved }:
                   style={{ background: "#232326" }}
                   whileHover={{ scale: 1.05, background: "#d4af37" }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => location && onShare?.(location.id)}
                 >
                   <Share size={18} className="action-icon" />
                   <span className="text-[11px] font-medium action-text">Share</span>
