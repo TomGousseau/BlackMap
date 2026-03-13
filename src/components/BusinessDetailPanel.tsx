@@ -37,36 +37,36 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
     <AnimatePresence>
       {business && (
         <motion.div
-          className="fixed top-0 right-0 bottom-0 z-[65] w-full max-w-[380px]"
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
+          className="fixed top-4 right-4 bottom-4 z-[65] w-full max-w-[360px]"
+          initial={{ x: "120%", opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: "120%", opacity: 0 }}
           transition={{ type: "spring" as const, stiffness: 350, damping: 34 }}
         >
           <div
-            className="h-full flex flex-col overflow-hidden"
+            className="h-full flex flex-col overflow-hidden rounded-3xl"
             style={{
-              background: "linear-gradient(180deg, #1a1a1e 0%, #141416 100%)",
-              boxShadow: "-12px 0 60px rgba(0,0,0,0.6)",
+              background: "linear-gradient(180deg, #18181b 0%, #0f0f10 100%)",
+              boxShadow: "0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)",
             }}
           >
             {/* Gloss overlay */}
             <div 
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none rounded-3xl"
               style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)",
-                borderLeft: "1px solid rgba(255,255,255,0.08)",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 40%, rgba(0,0,0,0.15) 100%)",
+                border: "1px solid rgba(255,255,255,0.08)",
               }}
             />
 
             {/* Header image/gradient */}
-            <div className="relative h-28 shrink-0" style={{
+            <div className="relative h-28 shrink-0 rounded-t-3xl overflow-hidden" style={{
               background: business.imageUrl 
-                ? `linear-gradient(to bottom, transparent 0%, #1a1a1e 100%), url(${business.imageUrl}) center/cover`
-                : "linear-gradient(135deg, #2a2520 0%, #1a1a1e 100%)",
+                ? `linear-gradient(to bottom, transparent 0%, #18181b 100%), url(${business.imageUrl}) center/cover`
+                : "linear-gradient(135deg, #252528 0%, #18181b 100%)",
             }}>
               <div className="absolute inset-0" style={{
-                background: "linear-gradient(to bottom, rgba(26,26,30,0) 0%, rgba(26,26,30,1) 100%)",
+                background: "linear-gradient(to bottom, rgba(24,24,27,0) 0%, rgba(24,24,27,1) 100%)",
               }} />
               
               {/* Close button */}
@@ -74,9 +74,9 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
                 onClick={onClose}
                 className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
                 style={{
-                  background: "rgba(0,0,0,0.5)",
+                  background: "rgba(0,0,0,0.6)",
                   backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                 }}
               >
                 <X size={16} style={{ color: "#fff" }} />
@@ -242,10 +242,10 @@ export function BusinessDetailPanel({ business, onClose, onAddReview }: Business
 
             {/* Write review section */}
             <div 
-              className="p-5 shrink-0"
+              className="p-5 shrink-0 rounded-b-3xl"
               style={{
-                background: "linear-gradient(180deg, #18181a 0%, #121214 100%)",
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                background: "linear-gradient(180deg, #141416 0%, #0c0c0e 100%)",
+                borderTop: "1px solid rgba(255,255,255,0.05)",
               }}
             >
               <div className="text-[11px] font-bold tracking-wider mb-3" style={{ color: "#6e6e73" }}>
