@@ -275,12 +275,12 @@ export default function HomePage() {
 
   const handleLocate = useCallback(() => {
     if (navigator.geolocation) {
-      showStatus("Finding your location...");
+      showStatus("Finding your location (local only)...");
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setCenter([pos.coords.latitude, pos.coords.longitude]);
           setZoom(15);
-          showStatus("Location found!");
+          showStatus("Location found! (only you can see this)");
         },
         () => showStatus("Could not get location")
       );
