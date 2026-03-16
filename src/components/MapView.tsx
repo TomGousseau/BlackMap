@@ -55,6 +55,23 @@ function MapEvents({ onMapClick, addingLocation, addingPerson }: { onMapClick?: 
   return null;
 }
 
+// Close popups on Escape key
+function EscapeHandler() {
+  const map = useMap();
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        map.closePopup();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [map]);
+  
+  return null;
+}
+
 function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   const prevZoom = useRef(zoom);
@@ -285,6 +302,7 @@ export function MapView({
       />
       <ChangeView center={center} zoom={zoom} />
       <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} addingPerson={addingPerson} />
+      <EscapeHandler />
       <ZoomAwareMarkers 
         locations={locations} 
         onLocationClick={onLocationClick} 
