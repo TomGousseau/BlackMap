@@ -13,6 +13,7 @@ interface BusinessProfileButtonProps {
   onSelectBusiness: (biz: BusinessProfile) => void;
   onSelectPerson?: (person: PersonData) => void;
   onOpenAdmin?: () => void;
+  onOpenSettings?: () => void;
   isAdmin?: boolean;
 }
 
@@ -24,6 +25,7 @@ export function BusinessProfileButton({
   onSelectBusiness,
   onSelectPerson,
   onOpenAdmin,
+  onOpenSettings,
   isAdmin,
 }: BusinessProfileButtonProps) {
   const [open, setOpen] = useState(false);
@@ -210,6 +212,7 @@ export function BusinessProfileButton({
             {/* Settings section */}
             <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />
             <motion.button
+              onClick={() => { onOpenSettings?.(); setOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer"
               style={{ color: "var(--color-text)" }}
               whileHover={{ background: "var(--color-surface-hover)" }}
@@ -221,7 +224,7 @@ export function BusinessProfileButton({
               <div className="flex-1">
                 <div className="text-sm font-semibold" style={{ color: "#8e8e93" }}>Settings</div>
                 <div className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
-                  Coming soon
+                  Sound, theme, signature
                 </div>
               </div>
               <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />

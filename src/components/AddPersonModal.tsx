@@ -23,9 +23,10 @@ interface AddPersonModalProps {
   editMode?: boolean;
   personToEdit?: PersonData | null;
   selectedStatus?: 'Updated' | 'Terminated' | 'Outdated';
+  defaultSignature?: string;
 }
 
-export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMode = false, personToEdit, selectedStatus }: AddPersonModalProps) {
+export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMode = false, personToEdit, selectedStatus, defaultSignature = "" }: AddPersonModalProps) {
   const [name, setName] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
   const [about, setAbout] = useState("");
@@ -51,6 +52,13 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
   const [age, setAge] = useState("");
   const [showSocialLinks, setShowSocialLinks] = useState(false);
   const [signature, setSignature] = useState("");
+
+  // Pre-fill signature with default when opening (not editing)
+  useEffect(() => {
+    if (isOpen && !editMode && defaultSignature) {
+      setSignature(defaultSignature);
+    }
+  }, [isOpen, editMode, defaultSignature]);
 
   // Pre-fill form when editing
   useEffect(() => {

@@ -14,6 +14,7 @@ import { AddBusinessModal } from "@/components/AddBusinessModal";
 import { BusinessDetailPanel } from "@/components/BusinessDetailPanel";
 import { AdminPanel } from "@/components/AdminPanel";
 import { AdminLoginModal } from "@/components/AdminLoginModal";
+import { SettingsPanel, useSettings } from "@/components/SettingsPanel";
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/data";
 import type { LocationData, BusinessProfile, BusinessReview, ReviewData, PersonData } from "@/lib/types";
 import Lenis from "lenis";
@@ -49,6 +50,8 @@ export default function HomePage() {
   const [selectedPerson, setSelectedPerson] = useState<PersonData | null>(null);
   const [editPersonData, setEditPersonData] = useState<PersonData | null>(null);
   const [editPersonStatus, setEditPersonStatus] = useState<'Updated' | 'Terminated' | 'Outdated' | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const userSettings = useSettings();
 
   // Lenis smooth scroll
   useEffect(() => {
@@ -463,6 +466,7 @@ export default function HomePage() {
             setShowAdminLogin(true);
           }
         }}
+        onOpenSettings={() => setShowSettings(true)}
         isAdmin={isAdmin}
       />
 
@@ -490,6 +494,12 @@ export default function HomePage() {
         onReject={handleRejectBusiness}
         onApprovePerson={handleApprovePerson}
         onRejectPerson={handleRejectPerson}
+      />
+
+      {/* Settings panel */}
+      <SettingsPanel
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
       />
 
       {/* Place detail */}
@@ -524,6 +534,7 @@ export default function HomePage() {
         editMode={!!editPersonData}
         personToEdit={editPersonData}
         selectedStatus={editPersonStatus || undefined}
+        defaultSignature={userSettings.defaultSignature}
       />
 
       {/* Person detail panel */}
