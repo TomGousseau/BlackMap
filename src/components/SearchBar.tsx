@@ -5,6 +5,44 @@ import { Search, X, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { LocationData } from "@/lib/types";
 
+const PLACEHOLDER_PHRASES = [
+  "Search Maps",
+  "Find a place...",
+  "Restaurants nearby",
+  "Search locations",
+];
+
+function useTypingAnimation(phrases: string[], typingSpeed = 80, deletingSpeed = 40, pauseDuration = 2000) {
+  const [displayText, setDisplayText] = useState("");
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = phrases[phraseIndex];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!isDeleting && displayText === current) {
+      timeout = setTimeout(() => setIsDeleting(true), pauseDuration);
+    } else if (isDeleting && displayText === "") {
+      setIsDeleting(false);
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    } else {
+      const speed = isDeleting ? deletingSpeed : typingSpeed;
+      timeout = setTimeout(() => {
+        setDisplayText(
+          isDeleting
+            ? current.slice(0, displayText.length - 1)
+            : current.slice(0, displayText.length + 1)
+        );
+      }, speed);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, phraseIndex, phrases, typingSpeed, deletingSpeed, pauseDuration]);
+
+  return displayText;
+}
+
 interface SearchBarProps {
   locations: LocationData[];
   popularSearches: string[];
@@ -15,8 +53,10 @@ interface SearchBarProps {
 export function SearchBar({ locations, popularSearches, onSelect, onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const typingText = useTypingAnimation(PLACEHOLDER_PHRASES);
 
   const filtered = query.trim()
     ? locations.filter(
@@ -25,6 +65,16 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
           l.category?.toLowerCase().includes(query.toLowerCase())
       ).slice(0, 5)
     : [];
+
+  // Simulate brief search animation when query changes
+  useEffect(() => {
+    if (query.trim()) {
+      setIsSearching(true);
+      const t = setTimeout(() => setIsSearching(false), 300);
+      return () => clearTimeout(t);
+    }
+    setIsSearching(false);
+  }, [query]);
 
   const showDropdown = focused && (query.trim() === "" || filtered.length > 0);
   const recentPlaces = [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
@@ -107,13 +157,52 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
 
             {/* Dropdown content */}
             <div className="max-h-[280px] overflow-y-auto border-t border-[#e5e5ea]" data-lenis-prevent>
-              {query.trim() && filtered.length > 0 ? (
+              {query.trim() && isSearching ? (
+                /* Loading shimmer */
                 <div className="py-1">
-                  {filtered.map((loc) => (
-                    <button
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 pl-5 pr-4 py-3">
+                      <div
+                        className="w-10 h-10 rounded-xl shrink-0"
+                        style={{
+                          background: "linear-gradient(90deg, #f2f2f7 25%, #e8e8ed 50%, #f2f2f7 75%)",
+                          backgroundSize: "200% 100%",
+                          animation: "shimmer 1.5s infinite",
+                        }}
+                      />
+                      <div className="flex-1 space-y-2">
+                        <div
+                          className="h-3.5 rounded-full"
+                          style={{
+                            width: `${60 + i * 10}%`,
+                            background: "linear-gradient(90deg, #f2f2f7 25%, #e8e8ed 50%, #f2f2f7 75%)",
+                            backgroundSize: "200% 100%",
+                            animation: `shimmer 1.5s infinite ${i * 0.15}s`,
+                          }}
+                        />
+                        <div
+                          className="h-2.5 rounded-full"
+                          style={{
+                            width: `${40 + i * 5}%`,
+                            background: "linear-gradient(90deg, #f2f2f7 25%, #e8e8ed 50%, #f2f2f7 75%)",
+                            backgroundSize: "200% 100%",
+                            animation: `shimmer 1.5s infinite ${i * 0.25}s`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : query.trim() && filtered.length > 0 ? (
+                <div className="py-1">
+                  {filtered.map((loc, idx) => (
+                    <motion.button
                       key={loc.id}
                       onClick={() => { onSelect(loc); setQuery(""); setFocused(false); }}
                       className="w-full flex items-center gap-3 pl-5 pr-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: idx * 0.05 }}
                     >
                       <div 
                         className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
@@ -129,7 +218,7 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                         <div className="text-[15px] font-medium truncate" style={{ color: "#000" }}>{loc.name}</div>
                         <div className="text-[13px]" style={{ color: "#8e8e93" }}>{loc.category}</div>
                       </div>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               ) : (
@@ -179,7 +268,16 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
             transition={{ duration: 0.15 }}
           >
             <Search size={16} style={{ color: "#8e8e93" }} />
-            <span className="text-[15px]" style={{ color: "#8e8e93" }}>Search Maps</span>
+            <span className="text-[15px]" style={{ color: "#8e8e93" }}>
+              {typingText}
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+                style={{ color: "#8e8e93" }}
+              >
+                |
+              </motion.span>
+            </span>
           </motion.button>
         )}
       </AnimatePresence>

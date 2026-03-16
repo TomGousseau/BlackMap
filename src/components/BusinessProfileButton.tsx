@@ -2,21 +2,29 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Plus, Star, Globe, ChevronRight, X, Shield, Sparkles, Clock } from "lucide-react";
-import type { BusinessProfile } from "@/lib/types";
+import { Building2, Plus, Star, Globe, ChevronRight, X, Shield, Sparkles, Clock, User, Users } from "lucide-react";
+import type { BusinessProfile, PersonData } from "@/lib/types";
 
 interface BusinessProfileButtonProps {
   businesses: BusinessProfile[];
+  persons?: PersonData[];
   onAddBusiness: () => void;
+  onAddPerson?: () => void;
   onSelectBusiness: (biz: BusinessProfile) => void;
+  onSelectPerson?: (person: PersonData) => void;
   onOpenAdmin?: () => void;
+  isAdmin?: boolean;
 }
 
 export function BusinessProfileButton({
   businesses,
+  persons = [],
   onAddBusiness,
+  onAddPerson,
   onSelectBusiness,
+  onSelectPerson,
   onOpenAdmin,
+  isAdmin,
 }: BusinessProfileButtonProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -109,7 +117,9 @@ export function BusinessProfileButton({
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-semibold" style={{ color: "#af52de" }}>Admin Panel</div>
-                    <div className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>Approve businesses</div>
+                    <div className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
+                      {isAdmin ? "Manage businesses" : "Login required"}
+                    </div>
                   </div>
                   <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
                 </motion.button>
@@ -191,6 +201,66 @@ export function BusinessProfileButton({
                       </div>
                     </div>
 
+                    <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
+                  </motion.button>
+                ))
+              )}
+            </div>
+
+            {/* People section */}
+            <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />
+            <div className="pl-5 pr-4 pt-3 pb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users size={14} style={{ color: "#06b6d4" }} />
+                <h3 className="text-sm font-bold" style={{ color: "#06b6d4" }}>People</h3>
+              </div>
+              {onAddPerson && (
+                <motion.button
+                  onClick={() => { onAddPerson(); setOpen(false); }}
+                  className="w-7 h-7 rounded-full flex items-center justify-center cursor-pointer"
+                  style={{
+                    background: "#06b6d4",
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Plus size={13} style={{ color: "#fff" }} />
+                </motion.button>
+              )}
+            </div>
+            <div className="max-h-48 overflow-y-auto p-2" data-lenis-prevent>
+              {persons.length === 0 ? (
+                <div className="py-4 text-center">
+                  <User size={22} style={{ color: "var(--color-text-secondary)", margin: "0 auto 6px" }} />
+                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                    No people added yet
+                  </p>
+                </div>
+              ) : (
+                persons.map((p) => (
+                  <motion.button
+                    key={p.id}
+                    onClick={() => { onSelectPerson?.(p); setOpen(false); }}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl text-left cursor-pointer"
+                    style={{ color: "var(--color-text)" }}
+                    whileHover={{ background: "var(--color-surface-hover)", x: 2 }}
+                  >
+                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+                      style={{ background: "rgba(6, 182, 212, 0.15)" }}>
+                      {p.imageUrl ? (
+                        <img src={p.imageUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={18} style={{ color: "#06b6d4" }} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm font-semibold truncate block">{p.name}</span>
+                      {p.reason && (
+                        <span className="text-[10px] truncate block" style={{ color: "var(--color-text-secondary)" }}>
+                          {p.reason}
+                        </span>
+                      )}
+                    </div>
                     <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
                   </motion.button>
                 ))

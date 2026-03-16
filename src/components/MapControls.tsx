@@ -9,6 +9,7 @@ import {
   Layers,
   Crosshair,
   Wrench,
+  UserPlus,
 } from "lucide-react";
 
 interface MapControlsProps {
@@ -17,7 +18,9 @@ interface MapControlsProps {
   onLocate: () => void;
   devMode: boolean;
   addingLocation: boolean;
+  addingPerson: boolean;
   onToggleAddLocation: () => void;
+  onToggleAddPerson: () => void;
   onToggleDevMode: () => void;
 }
 
@@ -65,7 +68,9 @@ export function MapControls({
   onLocate,
   devMode,
   addingLocation,
+  addingPerson,
   onToggleAddLocation,
+  onToggleAddPerson,
   onToggleDevMode,
 }: MapControlsProps) {
   return (
@@ -127,6 +132,26 @@ export function MapControls({
               onClick={onToggleAddLocation}
               label="Add location"
               active={addingLocation}
+              gold
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add person (only in dev mode) */}
+      <AnimatePresence>
+        {devMode && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring" as const, stiffness: 400, damping: 25, delay: 0.05 }}
+          >
+            <ControlButton
+              icon={UserPlus}
+              onClick={onToggleAddPerson}
+              label="Add person"
+              active={addingPerson}
               gold
             />
           </motion.div>

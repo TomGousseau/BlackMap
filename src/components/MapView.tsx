@@ -3,7 +3,7 @@
 import { useEffect, useRef, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
-import type { LocationData } from "@/lib/types";
+import type { LocationData, PersonData } from "@/lib/types";
 
 // Custom marker icons
 function createMarkerIcon(color: string) {
@@ -26,6 +26,7 @@ const goldIcon = createMarkerIcon("#c8a84e");
 const blueIcon = createMarkerIcon("#0a84ff");
 const redIcon = createMarkerIcon("#ff3b30");
 const purpleIcon = createMarkerIcon("#af52de"); // Important - unused for now
+const cyanIcon = createMarkerIcon("#06b6d4"); // Person marker
 
 // Minimum zoom level to show markers when there are 200+ locations
 const MIN_ZOOM_FOR_MARKERS = 8;
@@ -34,17 +35,20 @@ interface MapViewProps {
   center: [number, number];
   zoom: number;
   locations: LocationData[];
+  persons?: PersonData[];
   onLocationClick?: (loc: LocationData) => void;
+  onPersonClick?: (person: PersonData) => void;
   onMapClick?: (lat: number, lng: number) => void;
   devMode?: boolean;
   addingLocation?: boolean;
+  addingPerson?: boolean;
   savedLocationIds?: Set<string>;
 }
 
-function MapEvents({ onMapClick, addingLocation }: { onMapClick?: (lat: number, lng: number) => void; addingLocation?: boolean }) {
+function MapEvents({ onMapClick, addingLocation, addingPerson }: { onMapClick?: (lat: number, lng: number) => void; addingLocation?: boolean; addingPerson?: boolean }) {
   useMapEvents({
     click(e) {
-      if (addingLocation && onMapClick) {
+      if ((addingLocation || addingPerson) && onMapClick) {
         onMapClick(e.latlng.lat, e.latlng.lng);
       }
     },
@@ -164,10 +168,13 @@ export function MapView({
   center,
   zoom,
   locations,
+  persons = [],
   onLocationClick,
+  onPersonClick,
   onMapClick,
   devMode,
   addingLocation,
+  addingPerson,
   savedLocationIds = new Set(),
 }: MapViewProps) {
   // Check once if we need zoom-to-reveal mode (200+ locations)
@@ -187,7 +194,7 @@ export function MapView({
       minZoom={3}
       maxBounds={[[-85, -180], [85, 180]]}
       maxBoundsViscosity={1.0}
-      style={{ cursor: addingLocation ? "crosshair" : "grab", background: "#1a1a1d" }}
+      style={{ cursor: (addingLocation || addingPerson) ? "crosshair" : "grab", background: "#1a1a1d" }}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -197,13 +204,33 @@ export function MapView({
         updateWhenIdle={false}
       />
       <ChangeView center={center} zoom={zoom} />
-      <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} />
+      <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} addingPerson={addingPerson} />
       <ZoomAwareMarkers 
         locations={locations} 
         onLocationClick={onLocationClick} 
         requireZoom={requireZoom}
         savedLocationIds={savedLocationIds}
       />
+      {/* Person markers */}
+      {persons.map((p) => (
+        <Marker
+          key={p.id}
+          position={[p.lat, p.lng]}
+          icon={cyanIcon}
+          eventHandlers={{
+            click: () => onPersonClick?.(p),
+          }}
+        >
+          <Popup>
+            <div style={{ padding: "12px 16px", minWidth: 160, background: "#26262a", color: "#f0f0f2" }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: "#06b6d4" }}>{p.name}</div>
+              {p.reason && (
+                <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 4 }}>{p.reason}</div>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 }

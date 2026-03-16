@@ -7,12 +7,15 @@ import { SearchBar } from "@/components/SearchBar";
 import { MapControls } from "@/components/MapControls";
 import { PlaceDetail } from "@/components/PlaceDetail";
 import { AddLocationModal } from "@/components/AddLocationModal";
+import { AddPersonModal } from "@/components/AddPersonModal";
+import { PersonDetailPanel } from "@/components/PersonDetailPanel";
 import { BusinessProfileButton } from "@/components/BusinessProfileButton";
 import { AddBusinessModal } from "@/components/AddBusinessModal";
 import { BusinessDetailPanel } from "@/components/BusinessDetailPanel";
 import { AdminPanel } from "@/components/AdminPanel";
-import { FEATURED_LOCATIONS, POPULAR_SEARCHES, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/data";
-import type { LocationData, BusinessProfile, BusinessReview, ReviewData } from "@/lib/types";
+import { AdminLoginModal } from "@/components/AdminLoginModal";
+import { DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/data";
+import type { LocationData, BusinessProfile, BusinessReview, ReviewData, PersonData } from "@/lib/types";
 import Lenis from "lenis";
 
 // Dynamic import Leaflet (no SSR)
@@ -26,10 +29,11 @@ const MapView = dynamic(() => import("@/components/MapView").then((m) => m.MapVi
 export default function HomePage() {
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-  const [locations, setLocations] = useState<LocationData[]>(FEATURED_LOCATIONS);
+  const [locations, setLocations] = useState<LocationData[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [devMode, setDevMode] = useState(false);
   const [addingLocation, setAddingLocation] = useState(false);
+  const [addingPerson, setAddingPerson] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -37,12 +41,26 @@ export default function HomePage() {
   const [showAddBusiness, setShowAddBusiness] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessProfile | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [savedLocationIds, setSavedLocationIds] = useState<Set<string>>(new Set());
+  const [persons, setPersons] = useState<PersonData[]>([]);
+  const [showAddPerson, setShowAddPerson] = useState(false);
+  const [pendingPersonCoords, setPendingPersonCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<PersonData | null>(null);
 
   // Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis({ autoRaf: true });
     return () => lenis.destroy();
+  }, []);
+
+  // Load data from MongoDB on mount
+  useEffect(() => {
+    fetch("/api/locations").then(r => r.json()).then(setLocations).catch(() => {});
+    fetch("/api/businesses").then(r => r.json()).then(setBusinesses).catch(() => {});
+    fetch("/api/persons").then(r => r.json()).then(setPersons).catch(() => {});
+    fetch("/api/auth/check").then(r => r.json()).then(d => setIsAdmin(d.authenticated)).catch(() => {});
   }, []);
 
   // Check URL for shared location on load
@@ -88,14 +106,24 @@ export default function HomePage() {
       setPendingCoords({ lat, lng });
       setShowAddModal(true);
       setAddingLocation(false);
+    } else if (addingPerson) {
+      setPendingPersonCoords({ lat, lng });
+      setShowAddPerson(true);
+      setAddingPerson(false);
     }
-  }, [addingLocation]);
+  }, [addingLocation, addingPerson]);
 
   const handleSaveLocation = useCallback((loc: LocationData) => {
-    setLocations((prev) => [...prev, loc]);
-    showStatus(`"${loc.name}" added!`);
-    setCenter([loc.lat, loc.lng]);
-    setZoom(14);
+    fetch("/api/locations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loc),
+    }).then(r => r.json()).then((saved) => {
+      setLocations((prev) => [...prev, saved]);
+      showStatus(`"${loc.name}" added!`);
+      setCenter([loc.lat, loc.lng]);
+      setZoom(14);
+    }).catch(() => showStatus("Failed to save location"));
   }, [showStatus]);
 
   const handleToggleSaveLocation = useCallback((locId: string) => {
@@ -122,65 +150,112 @@ export default function HomePage() {
   }, [showStatus]);
 
   const handleSaveBusiness = useCallback((biz: BusinessProfile) => {
-    setBusinesses((prev) => [...prev, { ...biz, approved: false }]);
-    showStatus(`"${biz.name}" created! Pending approval.`);
+    fetch("/api/businesses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(biz),
+    }).then(r => r.json()).then((saved) => {
+      setBusinesses((prev) => [...prev, saved]);
+      showStatus(`"${biz.name}" created! Pending approval.`);
+    }).catch(() => showStatus("Failed to save business"));
   }, [showStatus]);
 
   const handleApproveBusiness = useCallback((bizId: string) => {
-    setBusinesses((prev) =>
-      prev.map((b) => (b.id === bizId ? { ...b, approved: true } : b))
-    );
-    showStatus("Business approved!");
+    fetch(`/api/businesses/${bizId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved: true }),
+    }).then(() => {
+      setBusinesses((prev) =>
+        prev.map((b) => (b.id === bizId ? { ...b, approved: true } : b))
+      );
+      showStatus("Business approved!");
+    }).catch(() => showStatus("Failed to approve"));
   }, [showStatus]);
 
   const handleRejectBusiness = useCallback((bizId: string) => {
-    setBusinesses((prev) => prev.filter((b) => b.id !== bizId));
-    showStatus("Business rejected");
+    fetch(`/api/businesses/${bizId}`, { method: "DELETE" }).then(() => {
+      setBusinesses((prev) => prev.filter((b) => b.id !== bizId));
+      showStatus("Business rejected");
+    }).catch(() => showStatus("Failed to reject"));
   }, [showStatus]);
 
   const handleToggleImportant = useCallback((bizId: string) => {
-    setBusinesses((prev) =>
-      prev.map((b) => (b.id === bizId ? { ...b, important: !b.important } : b))
-    );
-  }, []);
+    const biz = businesses.find(b => b.id === bizId);
+    if (!biz) return;
+    fetch(`/api/businesses/${bizId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ important: !biz.important }),
+    }).then(() => {
+      setBusinesses((prev) =>
+        prev.map((b) => (b.id === bizId ? { ...b, important: !b.important } : b))
+      );
+    }).catch(() => {});
+  }, [businesses]);
+
+  const handleSavePerson = useCallback((person: PersonData) => {
+    fetch("/api/persons", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(person),
+    }).then(r => r.json()).then((saved) => {
+      setPersons((prev) => [...prev, saved]);
+      showStatus(`"${person.name}" added!`);
+      setCenter([person.lat, person.lng]);
+      setZoom(14);
+    }).catch(() => showStatus("Failed to save person"));
+  }, [showStatus]);
 
   const handleAddBusinessReview = useCallback((bizId: string, review: BusinessReview) => {
-    setBusinesses((prev) =>
-      prev.map((b) => {
-        if (b.id !== bizId) return b;
-        const newReviews = [...b.reviews, review];
+    fetch(`/api/businesses/${bizId}/reviews`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(review),
+    }).then(() => {
+      setBusinesses((prev) =>
+        prev.map((b) => {
+          if (b.id !== bizId) return b;
+          const newReviews = [...b.reviews, review];
+          const avgRep = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
+          return { ...b, reviews: newReviews, reputation: Math.round(avgRep * 10) / 10 };
+        })
+      );
+      setSelectedBusiness((prev) => {
+        if (!prev || prev.id !== bizId) return prev;
+        const newReviews = [...prev.reviews, review];
         const avgRep = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
-        return { ...b, reviews: newReviews, reputation: Math.round(avgRep * 10) / 10 };
-      })
-    );
-    setSelectedBusiness((prev) => {
-      if (!prev || prev.id !== bizId) return prev;
-      const newReviews = [...prev.reviews, review];
-      const avgRep = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
-      return { ...prev, reviews: newReviews, reputation: Math.round(avgRep * 10) / 10 };
-    });
-    showStatus("Review added!");
+        return { ...prev, reviews: newReviews, reputation: Math.round(avgRep * 10) / 10 };
+      });
+      showStatus("Review added!");
+    }).catch(() => showStatus("Failed to add review"));
   }, [showStatus]);
 
   const handleZoomIn = useCallback(() => setZoom((z) => Math.min(z + 1, 18)), []);
   const handleZoomOut = useCallback(() => setZoom((z) => Math.max(z - 1, 3)), []);
 
   const handleAddLocationReview = useCallback((locId: string, review: ReviewData) => {
-    setLocations((prev) =>
-      prev.map((l) => {
-        if (l.id !== locId) return l;
-        const newReviews = [...(l.reviews || []), review];
+    fetch(`/api/locations/${locId}/reviews`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(review),
+    }).then(() => {
+      setLocations((prev) =>
+        prev.map((l) => {
+          if (l.id !== locId) return l;
+          const newReviews = [...(l.reviews || []), review];
+          const avgRating = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
+          return { ...l, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
+        })
+      );
+      setSelectedLocation((prev) => {
+        if (!prev || prev.id !== locId) return prev;
+        const newReviews = [...(prev.reviews || []), review];
         const avgRating = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
-        return { ...l, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
-      })
-    );
-    setSelectedLocation((prev) => {
-      if (!prev || prev.id !== locId) return prev;
-      const newReviews = [...(prev.reviews || []), review];
-      const avgRating = newReviews.reduce((sum, r) => sum + r.rating, 0) / newReviews.length;
-      return { ...prev, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
-    });
-    showStatus("Review added!");
+        return { ...prev, reviews: newReviews, rating: Math.round(avgRating * 10) / 10 };
+      });
+      showStatus("Review added!");
+    }).catch(() => showStatus("Failed to add review"));
   }, [showStatus]);
 
   const handleLocate = useCallback(() => {
@@ -218,10 +293,13 @@ export default function HomePage() {
           center={center}
           zoom={zoom}
           locations={locations}
+          persons={persons}
           onLocationClick={handleSelectLocation}
+          onPersonClick={(p: PersonData) => setSelectedPerson(p)}
           onMapClick={handleMapClick}
           devMode={devMode}
           addingLocation={addingLocation}
+          addingPerson={addingPerson}
           savedLocationIds={savedLocationIds}
         />
       </div>
@@ -229,7 +307,7 @@ export default function HomePage() {
       {/* Search bar */}
       <SearchBar
         locations={locations}
-        popularSearches={POPULAR_SEARCHES}
+        popularSearches={[]}
         onSelect={handleSelectLocation}
         onSearch={handleSearch}
       />
@@ -241,13 +319,23 @@ export default function HomePage() {
         onLocate={handleLocate}
         devMode={devMode}
         addingLocation={addingLocation}
+        addingPerson={addingPerson}
         onToggleDevMode={() => {
           setDevMode((v) => !v);
-          if (devMode) setAddingLocation(false);
+          if (devMode) {
+            setAddingLocation(false);
+            setAddingPerson(false);
+          }
         }}
         onToggleAddLocation={() => {
-          if (!addingLocation) showStatus("Click anywhere on the map to place a pin");
+          if (!addingLocation) showStatus("Click anywhere on the map to place a location pin");
           setAddingLocation((v) => !v);
+          setAddingPerson(false);
+        }}
+        onToggleAddPerson={() => {
+          if (!addingPerson) showStatus("Click anywhere on the map to place a person pin");
+          setAddingPerson((v) => !v);
+          setAddingLocation(false);
         }}
       />
 
@@ -298,9 +386,23 @@ export default function HomePage() {
       {/* Business profile button (top-right) */}
       <BusinessProfileButton
         businesses={businesses}
+        persons={persons}
         onAddBusiness={() => setShowAddBusiness(true)}
+        onAddPerson={() => setShowAddPerson(true)}
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}
-        onOpenAdmin={() => setShowAdminPanel(true)}
+        onSelectPerson={(p) => {
+          setSelectedPerson(p);
+          setCenter([p.lat, p.lng]);
+          setZoom(14);
+        }}
+        onOpenAdmin={() => {
+          if (isAdmin) {
+            setShowAdminPanel(true);
+          } else {
+            setShowAdminLogin(true);
+          }
+        }}
+        isAdmin={isAdmin}
       />
 
       {/* Business detail side panel */}
@@ -343,6 +445,32 @@ export default function HomePage() {
         onClose={() => { setShowAddModal(false); setPendingCoords(null); }}
         onSave={handleSaveLocation}
         pendingCoords={pendingCoords}
+      />
+
+      {/* Add person modal */}
+      <AddPersonModal
+        isOpen={showAddPerson}
+        onClose={() => { setShowAddPerson(false); setPendingPersonCoords(null); }}
+        onSave={handleSavePerson}
+        pendingCoords={pendingPersonCoords}
+      />
+
+      {/* Person detail panel */}
+      <PersonDetailPanel
+        person={selectedPerson}
+        onClose={() => setSelectedPerson(null)}
+      />
+
+      {/* Admin login modal */}
+      <AdminLoginModal
+        isOpen={showAdminLogin}
+        onClose={() => setShowAdminLogin(false)}
+        onSuccess={() => {
+          setIsAdmin(true);
+          setShowAdminLogin(false);
+          setShowAdminPanel(true);
+          showStatus("Logged in as admin");
+        }}
       />
 
       {/* Status toast */}

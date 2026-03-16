@@ -46,3 +46,19 @@ export interface BusinessReview {
   text: string;
   date: string;
 }
+
+export interface PersonData {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  address?: string;
+  imageUrl?: string;
+  about?: string;
+  reason?: string;
+  notableAction?: string;
+  workedFor?: string;
+  createdAt?: string;
+  approved?: boolean;
+  important?: boolean;
+}
