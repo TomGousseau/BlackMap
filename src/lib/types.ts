@@ -58,7 +58,7 @@ export interface PersonData {
   reason?: string;
   notableAction?: string;
   workedFor?: string;
-  relations?: string[]; // Related people names
+  relations?: { name: string; imageUrl?: string }[]; // Related people with optional picture
   age?: string;
   // Social links
   discord?: string; // Discord username

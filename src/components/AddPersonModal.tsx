@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 import { getNationalitySuggestions } from "@/lib/flags";
@@ -41,9 +41,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [steam, setSteam] = useState("");
   const [website, setWebsite] = useState("");
   const [nationality, setNationality] = useState("");
-  const [relations, setRelations] = useState<string[]>([]);
-  const [newRelation, setNewRelation] = useState("");
+  const [relations, setRelations] = useState<{ name: string; imageUrl?: string }[]>([]);
+  const [showAddRelation, setShowAddRelation] = useState(false);
+  const [newRelationName, setNewRelationName] = useState("");
+  const [newRelationImage, setNewRelationImage] = useState("");
   const [age, setAge] = useState("");
+  const [showSocialLinks, setShowSocialLinks] = useState(false);
 
   // Nationality suggestions
   const [nationalitySuggestions, setNationalitySuggestions] = useState<{ name: string; emoji: string }[]>([]);
@@ -136,9 +139,17 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
 
   // Add relation
   const addRelation = () => {
-    if (newRelation.trim() && !relations.includes(newRelation.trim())) {
-      setRelations([...relations, newRelation.trim()]);
-      setNewRelation("");
+    if (newRelationName.trim()) {
+      // Check if name already exists
+      if (!relations.some(r => r.name.toLowerCase() === newRelationName.trim().toLowerCase())) {
+        setRelations([...relations, { 
+          name: newRelationName.trim(), 
+          imageUrl: newRelationImage.trim() || undefined 
+        }]);
+      }
+      setNewRelationName("");
+      setNewRelationImage("");
+      setShowAddRelation(false);
     }
   };
 
@@ -176,7 +187,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     setReason(""); setNotableAction(""); setWorkedFor("");
     setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
     setVk(""); setGithub(""); setSteam(""); setWebsite(""); setNationality("");
-    setRelations([]); setNewRelation(""); setAge("");
+    setRelations([]); setNewRelationName(""); setNewRelationImage(""); setAge(""); setShowSocialLinks(false); setShowAddRelation(false);
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -471,12 +482,32 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     )}
                   </div>
 
-                  {/* Social Links Section */}
+                  {/* Social Links Section - Collapsible */}
                   <div>
-                    <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--color-text-secondary)" }}>
-                      Social Links <span className="text-[10px] font-normal">(optional)</span>
-                    </label>
-                    <div className="space-y-2">
+                    <motion.button
+                      type="button"
+                      onClick={() => setShowSocialLinks(!showSocialLinks)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold cursor-pointer"
+                      style={{ background: "var(--color-surface)", color: "var(--color-text-secondary)" }}
+                      whileHover={{ background: "var(--color-surface-hover)" }}
+                    >
+                      <span>Social Links <span className="text-[10px] font-normal">(optional)</span></span>
+                      <motion.div
+                        animate={{ rotate: showSocialLinks ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown size={16} />
+                      </motion.div>
+                    </motion.button>
+                    <AnimatePresence>
+                      {showSocialLinks && (
+                        <motion.div
+                          className="space-y-2 mt-3"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
                       {/* Discord Username */}
                       <div className="relative">
                         <MessageCircle size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
@@ -647,7 +678,9 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           }}
                         />
                       </div>
-                    </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   {/* Nationality */}
@@ -822,48 +855,124 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Relations <span className="text-[10px] font-normal">(connected people)</span>
                     </label>
-                    <div className="flex gap-2">
-                      <input
-                        value={newRelation}
-                        onChange={(e) => setNewRelation(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addRelation())}
-                        placeholder="Add a person's name..."
-                        className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none"
-                        style={{
-                          background: "var(--color-surface)",
-                          color: "var(--color-text)",
-                          border: "1px solid var(--color-border)",
-                        }}
-                      />
-                      <motion.button
-                        type="button"
-                        onClick={addRelation}
-                        className="px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer"
-                        style={{ background: "#06b6d4", color: "#000" }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        Add
-                      </motion.button>
-                    </div>
-                    {/* Show added relations as tags */}
+                    
+                    {/* Show added relations as badges with pics */}
                     {relations.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {relations.map((rel, idx) => (
-                          <motion.span
+                          <motion.div
                             key={idx}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer"
-                            style={{ background: "rgba(6, 182, 212, 0.15)", color: "#06b6d4" }}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer"
+                            style={{ background: "rgba(6, 182, 212, 0.15)" }}
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            whileHover={{ background: "rgba(255, 59, 48, 0.2)", color: "#ff3b30" }}
+                            whileHover={{ background: "rgba(255, 59, 48, 0.2)" }}
                             onClick={() => setRelations(relations.filter((_, i) => i !== idx))}
                           >
-                            {rel}
-                            <X size={12} />
-                          </motion.span>
+                            {rel.imageUrl ? (
+                              <img src={rel.imageUrl} alt={rel.name} className="w-5 h-5 rounded-full object-cover" />
+                            ) : (
+                              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#06b6d4" }}>
+                                <User size={10} style={{ color: "#000" }} />
+                              </div>
+                            )}
+                            <span className="text-xs font-medium" style={{ color: "#06b6d4" }}>{rel.name}</span>
+                            <X size={12} style={{ color: "#06b6d4" }} />
+                          </motion.div>
                         ))}
                       </div>
+                    )}
+
+                    {/* Add relation button or form */}
+                    {!showAddRelation ? (
+                      <motion.button
+                        type="button"
+                        onClick={() => setShowAddRelation(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer w-full justify-center"
+                        style={{ background: "var(--color-surface)", color: "#06b6d4", border: "1px dashed rgba(6, 182, 212, 0.3)" }}
+                        whileHover={{ scale: 1.01, borderColor: "#06b6d4" }}
+                        whileTap={{ scale: 0.99 }}
+                      >
+                        <Plus size={14} />
+                        Add Connection
+                      </motion.button>
+                    ) : (
+                      <motion.div
+                        className="p-4 rounded-2xl space-y-3"
+                        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold" style={{ color: "#06b6d4" }}>New Connection</span>
+                          <motion.button
+                            type="button"
+                            onClick={() => { setShowAddRelation(false); setNewRelationName(""); setNewRelationImage(""); }}
+                            className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer"
+                            style={{ background: "rgba(255,255,255,0.1)" }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <X size={12} style={{ color: "var(--color-text-secondary)" }} />
+                          </motion.button>
+                        </div>
+                        <div className="relative">
+                          <User size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                            style={{ color: "#06b6d4", left: "12px", zIndex: 1 }} />
+                          <input
+                            value={newRelationName}
+                            onChange={(e) => setNewRelationName(e.target.value)}
+                            placeholder="Person name *"
+                            className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                            style={{
+                              background: "var(--color-surface-hover)",
+                              color: "var(--color-text)",
+                              border: "1px solid var(--color-border)",
+                              paddingLeft: "40px",
+                            }}
+                          />
+                        </div>
+                        <div className="relative">
+                          <ImagePlus size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                            style={{ color: "#06b6d4", left: "12px", zIndex: 1 }} />
+                          <input
+                            value={newRelationImage}
+                            onChange={(e) => setNewRelationImage(e.target.value)}
+                            placeholder="Image URL (optional)"
+                            className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                            style={{
+                              background: "var(--color-surface-hover)",
+                              color: "var(--color-text)",
+                              border: "1px solid var(--color-border)",
+                              paddingLeft: "40px",
+                            }}
+                          />
+                        </div>
+                        {/* Preview */}
+                        {(newRelationName || newRelationImage) && (
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "rgba(6, 182, 212, 0.1)" }}>
+                            {newRelationImage ? (
+                              <img src={newRelationImage} alt="Preview" className="w-8 h-8 rounded-full object-cover" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#06b6d4" }}>
+                                <User size={14} style={{ color: "#000" }} />
+                              </div>
+                            )}
+                            <span className="text-sm" style={{ color: "#06b6d4" }}>{newRelationName || "Name..."}</span>
+                          </div>
+                        )}
+                        <motion.button
+                          type="button"
+                          onClick={addRelation}
+                          disabled={!newRelationName.trim()}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold cursor-pointer disabled:opacity-40"
+                          style={{ background: "#06b6d4", color: "#000" }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          Save Connection
+                        </motion.button>
+                      </motion.div>
                     )}
                   </div>
 
@@ -871,12 +980,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                   <motion.button
                     onClick={handleSave}
                     disabled={!name.trim() || !finalCoords}
-                    className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white cursor-pointer disabled:opacity-40 mt-2 mb-1"
+                    className="w-full py-4.5 rounded-2xl text-base font-bold text-white cursor-pointer disabled:opacity-40 mt-4 mb-2"
                     style={{
                       background: "linear-gradient(135deg, #0891b2, #06b6d4)",
-                      boxShadow: "0 4px 15px rgba(6, 182, 212, 0.3)",
+                      boxShadow: "0 6px 20px rgba(6, 182, 212, 0.4)",
+                      fontSize: "16px",
+                      padding: "18px",
                     }}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.02, boxShadow: "0 8px 25px rgba(6, 182, 212, 0.5)" }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Add Person

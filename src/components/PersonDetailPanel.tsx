@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github, User } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 import { getFlagEmoji } from "@/lib/flags";
 import { truncateText } from "@/lib/sanitize";
@@ -558,30 +558,6 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                 </>
               )}
 
-              {/* Relations / Connections */}
-              {location.relations && location.relations.length > 0 && (
-                <>
-                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
-                  <div className="px-6 py-5">
-                    <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RELATIONS</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {location.relations.map((rel, idx) => (
-                        <motion.button
-                          key={idx}
-                          className="px-4 py-2 rounded-xl text-sm font-medium cursor-pointer"
-                          style={{ background: "rgba(6, 182, 212, 0.15)", color: "#06b6d4" }}
-                          whileHover={{ scale: 1.05, background: "rgba(6, 182, 212, 0.25)" }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => onShowStatus?.(`Search for "${rel}" in the search bar`)}
-                        >
-                          {rel}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
@@ -631,6 +607,37 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                   </div>
                 ) : (
                   <span className="text-[13px]" style={{ color: "#8e8e93" }}>Not yet rated</span>
+                )}
+
+                {/* Relations / Connections - as badges with pics */}
+                {location.relations && location.relations.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>CONNECTIONS</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {location.relations.map((rel, idx) => {
+                        const relData = typeof rel === 'string' ? { name: rel } : rel;
+                        return (
+                          <motion.button
+                            key={idx}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer"
+                            style={{ background: "rgba(6, 182, 212, 0.12)" }}
+                            whileHover={{ scale: 1.05, background: "rgba(6, 182, 212, 0.2)" }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => onShowStatus?.(`Search for "${relData.name}" in the search bar`)}
+                          >
+                            {relData.imageUrl ? (
+                              <img src={relData.imageUrl} alt={relData.name} className="w-7 h-7 rounded-full object-cover" />
+                            ) : (
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#06b6d4" }}>
+                                <User size={12} style={{ color: "#000" }} />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium" style={{ color: "#06b6d4" }}>{relData.name}</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
               </div>
 
