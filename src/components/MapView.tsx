@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import type { LocationData, PersonData } from "@/lib/types";
 
@@ -28,8 +29,75 @@ const redIcon = createMarkerIcon("#ff3b30");
 const purpleIcon = createMarkerIcon("#af52de"); // Important - unused for now
 const cyanIcon = createMarkerIcon("#06b6d4"); // Person marker
 
-// Minimum zoom level to show markers when there are 200+ locations
-const MIN_ZOOM_FOR_MARKERS = 8;
+// Custom cluster icon creator - gold themed
+function createClusterIcon(cluster: L.MarkerCluster, color: string = "#c8a84e") {
+  const count = cluster.getChildCount();
+  let size = 40;
+  let fontSize = 12;
+  
+  if (count >= 1000) {
+    size = 60;
+    fontSize = 14;
+  } else if (count >= 100) {
+    size = 50;
+    fontSize = 13;
+  }
+  
+  return L.divIcon({
+    html: `<div style="
+      background: linear-gradient(135deg, ${color}40, ${color}80);
+      border: 2px solid ${color};
+      border-radius: 50%;
+      width: ${size}px;
+      height: ${size}px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: ${fontSize}px;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 12px ${color}60;
+    ">${count >= 1000 ? Math.round(count/1000) + 'k' : count}</div>`,
+    className: '',
+    iconSize: L.point(size, size),
+    iconAnchor: L.point(size / 2, size / 2),
+  });
+}
+
+// Cluster config based on pin count
+// 100+ pins = country level clustering (maxClusterRadius 80, disable at zoom 6)
+// 1000+ pins = city level clustering (maxClusterRadius 120, disable at zoom 10)
+function getClusterConfig(count: number) {
+  if (count >= 1000) {
+    return {
+      maxClusterRadius: 120, // Larger radius = more aggressive grouping
+      disableClusteringAtZoom: 12, // Stop clustering at city zoom
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      animate: true,
+    };
+  } else if (count >= 100) {
+    return {
+      maxClusterRadius: 80,
+      disableClusteringAtZoom: 8, // Stop clustering at country zoom
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      animate: true,
+    };
+  }
+  // Less than 100 - minimal clustering
+  return {
+    maxClusterRadius: 40,
+    disableClusteringAtZoom: 5,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    animate: true,
+  };
+}
 
 interface MapViewProps {
   center: [number, number];
@@ -91,49 +159,24 @@ function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }
 }
 
 // Component to track zoom and bounds, filter visible markers
-function ZoomAwareMarkers({ 
+function ClusteredLocationMarkers({ 
   locations, 
   onLocationClick, 
-  requireZoom,
   savedLocationIds 
 }: { 
   locations: LocationData[]; 
   onLocationClick?: (loc: LocationData) => void;
-  requireZoom: boolean;
   savedLocationIds: Set<string>;
 }) {
-  const map = useMap();
-  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
-  const [bounds, setBounds] = useState(map.getBounds());
-
-  useMapEvents({
-    zoomend: () => {
-      setCurrentZoom(map.getZoom());
-      setBounds(map.getBounds());
-    },
-    moveend: () => {
-      setBounds(map.getBounds());
-    },
-  });
-
-  // Filter locations: if requireZoom is true, only show when zoomed in enough and in viewport
-  // BUT always show saved locations regardless of zoom
-  const visibleLocations = useMemo(() => {
-    if (!requireZoom) return locations;
-    
-    // Always show saved locations + locations in viewport when zoomed in
-    return locations.filter(loc => {
-      // Always show saved locations
-      if (savedLocationIds.has(loc.id)) return true;
-      // Show others only when zoomed in enough and in viewport
-      if (currentZoom < MIN_ZOOM_FOR_MARKERS) return false;
-      return bounds.contains([loc.lat, loc.lng]);
-    });
-  }, [locations, requireZoom, currentZoom, bounds, savedLocationIds]);
-
+  const clusterConfig = useMemo(() => getClusterConfig(locations.length), [locations.length]);
+  
   return (
-    <>
-      {visibleLocations.map((loc) => {
+    <MarkerClusterGroup
+      {...clusterConfig}
+      iconCreateFunction={(cluster) => createClusterIcon(cluster, "#c8a84e")}
+      chunkedLoading
+    >
+      {locations.map((loc) => {
         const isSaved = savedLocationIds.has(loc.id);
         let icon = blueIcon;
         if (isSaved) icon = redIcon;
@@ -176,49 +219,29 @@ function ZoomAwareMarkers({
           </Marker>
         );
       })}
-    </>
+    </MarkerClusterGroup>
   );
 }
 
-// Zoom-aware person markers - same behavior as locations
-function ZoomAwarePersonMarkers({ 
+// Clustered person markers
+function ClusteredPersonMarkers({ 
   persons, 
   onPersonClick,
-  requireZoom,
   savedIds 
 }: { 
   persons: PersonData[]; 
   onPersonClick?: (person: PersonData) => void;
-  requireZoom: boolean;
   savedIds: Set<string>;
 }) {
-  const map = useMap();
-  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
-  const [bounds, setBounds] = useState(map.getBounds());
-
-  useMapEvents({
-    zoomend: () => {
-      setCurrentZoom(map.getZoom());
-      setBounds(map.getBounds());
-    },
-    moveend: () => {
-      setBounds(map.getBounds());
-    },
-  });
-
-  const visiblePersons = useMemo(() => {
-    if (!requireZoom) return persons;
-    
-    return persons.filter(p => {
-      if (savedIds.has(p.id)) return true;
-      if (currentZoom < MIN_ZOOM_FOR_MARKERS) return false;
-      return bounds.contains([p.lat, p.lng]);
-    });
-  }, [persons, requireZoom, currentZoom, bounds, savedIds]);
+  const clusterConfig = useMemo(() => getClusterConfig(persons.length), [persons.length]);
 
   return (
-    <>
-      {visiblePersons.map((p) => {
+    <MarkerClusterGroup
+      {...clusterConfig}
+      iconCreateFunction={(cluster) => createClusterIcon(cluster, "#06b6d4")}
+      chunkedLoading
+    >
+      {persons.map((p) => {
         const isSaved = savedIds.has(p.id);
         const icon = isSaved ? redIcon : (p.important ? purpleIcon : cyanIcon);
         
@@ -258,7 +281,7 @@ function ZoomAwarePersonMarkers({
           </Marker>
         );
       })}
-    </>
+    </MarkerClusterGroup>
   );
 }
 
@@ -274,10 +297,6 @@ export function MapView({
   addingPerson,
   savedLocationIds = new Set(),
 }: MapViewProps) {
-  // Check once if we need zoom-to-reveal mode (200+ items)
-  const [requireZoom] = useState(() => locations.length >= 200);
-  const [requireZoomPersons] = useState(() => persons.length >= 200);
-
   return (
     <MapContainer
       center={center}
@@ -303,16 +322,14 @@ export function MapView({
       <ChangeView center={center} zoom={zoom} />
       <MapEvents onMapClick={onMapClick} addingLocation={addingLocation} addingPerson={addingPerson} />
       <EscapeHandler />
-      <ZoomAwareMarkers 
+      <ClusteredLocationMarkers 
         locations={locations} 
         onLocationClick={onLocationClick} 
-        requireZoom={requireZoom}
         savedLocationIds={savedLocationIds}
       />
-      <ZoomAwarePersonMarkers 
+      <ClusteredPersonMarkers 
         persons={persons} 
         onPersonClick={onPersonClick} 
-        requireZoom={requireZoomPersons}
         savedIds={savedLocationIds}
       />
     </MapContainer>

@@ -58,6 +58,8 @@ export interface PersonData {
   reason?: string;
   notableAction?: string;
   workedFor?: string;
+  relations?: string[]; // Related people names
+  age?: string;
   // Social links
   discord?: string; // Discord username
   youtube?: string; // YouTube channel URL

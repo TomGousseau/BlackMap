@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
+import { getNationalitySuggestions } from "@/lib/flags";
 
 interface NominatimResult {
   place_id: number;
@@ -40,6 +41,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [steam, setSteam] = useState("");
   const [website, setWebsite] = useState("");
   const [nationality, setNationality] = useState("");
+  const [relations, setRelations] = useState<string[]>([]);
+  const [newRelation, setNewRelation] = useState("");
+  const [age, setAge] = useState("");
+
+  // Nationality suggestions
+  const [nationalitySuggestions, setNationalitySuggestions] = useState<{ name: string; emoji: string }[]>([]);
+  const [showNationalitySuggestions, setShowNationalitySuggestions] = useState(false);
+  const nationalityRef = useRef<HTMLDivElement>(null);
 
   // Location input mode
   const [locationMode, setLocationMode] = useState<"address" | "coords">("address");
@@ -102,6 +111,37 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     setShowSuggestions(false);
   };
 
+  // Nationality suggestions effect
+  useEffect(() => {
+    if (nationality.length >= 2) {
+      const results = getNationalitySuggestions(nationality);
+      setNationalitySuggestions(results);
+      setShowNationalitySuggestions(results.length > 0);
+    } else {
+      setNationalitySuggestions([]);
+      setShowNationalitySuggestions(false);
+    }
+  }, [nationality]);
+
+  // Close nationality suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (nationalityRef.current && !nationalityRef.current.contains(e.target as Node)) {
+        setShowNationalitySuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Add relation
+  const addRelation = () => {
+    if (newRelation.trim() && !relations.includes(newRelation.trim())) {
+      setRelations([...relations, newRelation.trim()]);
+      setNewRelation("");
+    }
+  };
+
   const handleSave = () => {
     if (!name.trim() || !finalCoords) return;
     const validImages = imageUrls.filter(url => url.trim());
@@ -127,6 +167,8 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
       steam: steam.trim() || undefined,
       website: website.trim() || undefined,
       nationality: nationality.trim() || undefined,
+      relations: relations.length > 0 ? relations : undefined,
+      age: age.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
     // Reset
@@ -134,6 +176,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     setReason(""); setNotableAction(""); setWorkedFor("");
     setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
     setVk(""); setGithub(""); setSteam(""); setWebsite(""); setNationality("");
+    setRelations([]); setNewRelation(""); setAge("");
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -612,13 +655,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Nationality <span className="text-[10px] font-normal">(optional)</span>
                     </label>
-                    <div className="relative">
+                    <div className="relative" ref={nationalityRef}>
                       <Flag size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
                         style={{ color: "var(--color-gold)", left: "16px", zIndex: 1 }} />
                       <input
                         value={nationality}
                         onChange={(e) => setNationality(e.target.value)}
-                        placeholder="e.g. American, British, etc."
+                        onFocus={() => { if (nationalitySuggestions.length > 0) setShowNationalitySuggestions(true); }}
+                        placeholder="Start typing..."
                         className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                         style={{
                           background: "var(--color-surface)",
@@ -627,19 +671,78 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           paddingLeft: "52px",
                         }}
                       />
+                      {/* Nationality suggestions dropdown */}
+                      <AnimatePresence>
+                        {showNationalitySuggestions && nationalitySuggestions.length > 0 && (
+                          <motion.div
+                            className="absolute left-0 right-0 top-full mt-1.5 rounded-xl overflow-hidden z-10"
+                            style={{
+                              background: "var(--color-surface)",
+                              border: "1px solid var(--color-border)",
+                              boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+                            }}
+                            initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                            transition={{ duration: 0.15 }}
+                          >
+                            <div className="py-1 max-h-[200px] overflow-y-auto" data-lenis-prevent>
+                              {nationalitySuggestions.map((suggestion, idx) => (
+                                <motion.button
+                                  key={suggestion.name}
+                                  onClick={() => {
+                                    setNationality(suggestion.name);
+                                    setShowNationalitySuggestions(false);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer transition-colors"
+                                  style={{ borderBottom: idx < nationalitySuggestions.length - 1 ? "1px solid var(--color-border)" : "none" }}
+                                  initial={{ opacity: 0, x: -8 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.15, delay: idx * 0.04 }}
+                                  whileHover={{ background: "var(--color-surface-hover)" }}
+                                >
+                                  <span className="text-lg">{suggestion.emoji}</span>
+                                  <span className="text-sm" style={{ color: "var(--color-text)" }}>
+                                    {suggestion.name}
+                                  </span>
+                                </motion.button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
+                  </div>
+
+                  {/* Age */}
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Age <span className="text-[10px] font-normal">(optional)</span>
+                    </label>
+                    <input
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      placeholder="e.g. 25"
+                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
+                      style={{
+                        background: "var(--color-surface)",
+                        color: "var(--color-text)",
+                        border: "1px solid var(--color-border)",
+                      }}
+                    />
                   </div>
 
                   {/* About */}
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
-                      About <span className="text-[10px] font-normal">(optional)</span>
+                      About <span className="text-[10px] font-normal">(optional, max 200 chars)</span>
                     </label>
                     <textarea
                       value={about}
-                      onChange={(e) => setAbout(e.target.value)}
+                      onChange={(e) => setAbout(e.target.value.slice(0, 200))}
                       placeholder="Brief bio..."
                       rows={2}
+                      maxLength={200}
                       className="w-full px-4 py-3 rounded-2xl text-sm outline-none resize-none"
                       style={{
                         background: "var(--color-surface)",
@@ -647,17 +750,21 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                         border: "1px solid var(--color-border)",
                       }}
                     />
+                    <div className="text-[10px] mt-1 text-right" style={{ color: about.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
+                      {about.length}/200
+                    </div>
                   </div>
 
                   {/* Reason */}
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
-                      Reason <span className="text-[10px] font-normal">(why they're notable)</span>
+                      Reason <span className="text-[10px] font-normal">(why they're notable, max 200 chars)</span>
                     </label>
                     <input
                       value={reason}
-                      onChange={(e) => setReason(e.target.value)}
+                      onChange={(e) => setReason(e.target.value.slice(0, 200))}
                       placeholder="e.g. Founded a tech company"
+                      maxLength={200}
                       className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
                       style={{
                         background: "var(--color-surface)",
@@ -665,17 +772,21 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                         border: "1px solid var(--color-border)",
                       }}
                     />
+                    <div className="text-[10px] mt-1 text-right" style={{ color: reason.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
+                      {reason.length}/200
+                    </div>
                   </div>
 
                   {/* Notable Action */}
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
-                      Notable Action <span className="text-[10px] font-normal">(optional)</span>
+                      Notable Action <span className="text-[10px] font-normal">(optional, max 200 chars)</span>
                     </label>
                     <input
                       value={notableAction}
-                      onChange={(e) => setNotableAction(e.target.value)}
+                      onChange={(e) => setNotableAction(e.target.value.slice(0, 200))}
                       placeholder="e.g. Invented the smartphone"
+                      maxLength={200}
                       className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
                       style={{
                         background: "var(--color-surface)",
@@ -683,6 +794,9 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                         border: "1px solid var(--color-border)",
                       }}
                     />
+                    <div className="text-[10px] mt-1 text-right" style={{ color: notableAction.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
+                      {notableAction.length}/200
+                    </div>
                   </div>
 
                   {/* Worked For */}

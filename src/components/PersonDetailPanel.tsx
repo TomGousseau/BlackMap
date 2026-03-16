@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 import { getFlagEmoji } from "@/lib/flags";
+import { truncateText } from "@/lib/sanitize";
 
 interface PersonDetailPanelProps {
   person: PersonData | null;
@@ -493,12 +494,22 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
+              {/* Age */}
+              {location.age && (
+                <div className="px-6 py-5">
+                  <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>AGE</h3>
+                  <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
+                    {location.age}
+                  </p>
+                </div>
+              )}
+
               {/* About */}
               {location.about && (
                 <div className="px-6 py-5">
                   <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>ABOUT</h3>
-                  <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
-                    {location.about}
+                  <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                    {truncateText(location.about, 200)}
                   </p>
                 </div>
               )}
@@ -509,8 +520,8 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                   <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>WHY NOTABLE</h3>
-                    <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
-                      {location.reason}
+                    <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                      {truncateText(location.reason, 200)}
                     </p>
                   </div>
                 </>
@@ -522,8 +533,8 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                   <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-5">
                     <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>NOTABLE ACTION</h3>
-                    <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
-                      {location.notableAction}
+                    <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                      {truncateText(location.notableAction, 200)}
                     </p>
                   </div>
                 </>
