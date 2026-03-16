@@ -360,11 +360,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                                 setImageUrls(newUrls);
                               }}
                               placeholder="https://example.com/photo.jpg"
-                              className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                              className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                               style={{
                                 background: "var(--color-surface)",
                                 color: "var(--color-text)",
                                 border: "1px solid var(--color-border)",
+                                paddingLeft: "44px",
                               }}
                             />
                           </div>
@@ -425,11 +426,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={discord}
                           onChange={(e) => setDiscord(e.target.value)}
                           placeholder="Discord username"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
@@ -441,11 +443,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={discordId}
                           onChange={(e) => setDiscordId(e.target.value)}
                           placeholder="Discord ID (numbers)"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
@@ -457,11 +460,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={youtube}
                           onChange={(e) => setYoutube(e.target.value)}
                           placeholder="YouTube channel URL"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
@@ -473,11 +477,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="Phone number"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
@@ -489,11 +494,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={telegram}
                           onChange={(e) => setTelegram(e.target.value)}
                           placeholder="Telegram @ username"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
@@ -505,11 +511,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={telegramId}
                           onChange={(e) => setTelegramId(e.target.value)}
                           placeholder="Telegram ID (numbers)"
-                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
                           }}
                         />
                       </div>
