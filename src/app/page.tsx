@@ -469,6 +469,7 @@ export default function HomePage() {
         }}
         isSaved={selectedPerson ? savedLocationIds.has(selectedPerson.id) : false}
         isAdmin={isAdmin}
+        onShowStatus={showStatus}
       />
 
       {/* Admin login modal */}

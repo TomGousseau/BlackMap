@@ -12,12 +12,13 @@ interface PersonDetailPanelProps {
   onSave?: (personId: string) => void;
   onShare?: (personId: string) => void;
   onDelete?: (personId: string) => void;
+  onShowStatus?: (msg: string) => void;
   isAdmin?: boolean;
   isSaved?: boolean;
   currentUserId?: string;
 }
 
-export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShare, onDelete, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
+export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShare, onDelete, onShowStatus, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
   const location = person;
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
@@ -186,7 +187,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                         style={{ background: "#232326" }}
                         whileHover={{ scale: 1.05, background: "#5865F2" }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => navigator.clipboard.writeText(location.discord!).then(() => alert("Discord copied!"))}
+                        onClick={() => navigator.clipboard.writeText(location.discord!).then(() => onShowStatus?.("Discord copied!"))}
                       >
                         <MessageCircle size={18} className="action-icon" />
                         <span className="text-[11px] font-medium action-text">Discord</span>
@@ -269,7 +270,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                     <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Discord ID:</span>
                     <span className="text-xs font-mono" style={{ color: "#fff" }}>{location.discordId}</span>
                     <button 
-                      onClick={() => navigator.clipboard.writeText(location.discordId!)}
+                      onClick={() => navigator.clipboard.writeText(location.discordId!).then(() => onShowStatus?.("Discord ID copied!"))}
                       className="ml-auto text-xs cursor-pointer"
                       style={{ color: "#5865F2" }}
                     >
