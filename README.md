@@ -260,3 +260,10 @@ mapsapp/
 | `npm run build` | Create production build |
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
+
+---
+
+## TODO (Security)
+
+- [ ] **CAPTCHA on creation forms** — Add CAPTCHA verification (e.g., hCaptcha, reCAPTCHA) to location/business/person creation forms to prevent bot submissions
+- [ ] **IP rate limiting via Cloudflare** — Use `CF-Connecting-IP` header for rate limiting API endpoints (creation, reviews) to prevent abuse

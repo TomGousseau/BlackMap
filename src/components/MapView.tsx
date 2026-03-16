@@ -210,25 +210,28 @@ export function MapView({
         savedLocationIds={savedLocationIds}
       />
       {/* Person markers */}
-      {persons.map((p) => (
-        <Marker
-          key={p.id}
-          position={[p.lat, p.lng]}
-          icon={cyanIcon}
-          eventHandlers={{
-            click: () => onPersonClick?.(p),
-          }}
-        >
-          <Popup>
-            <div style={{ padding: "12px 16px", minWidth: 160, background: "#26262a", color: "#f0f0f2" }}>
-              <div style={{ fontWeight: 600, fontSize: 14, color: "#06b6d4" }}>{p.name}</div>
-              {p.reason && (
-                <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 4 }}>{p.reason}</div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {persons.map((p) => {
+        const isSaved = savedLocationIds.has(p.id);
+        return (
+          <Marker
+            key={p.id}
+            position={[p.lat, p.lng]}
+            icon={isSaved ? redIcon : cyanIcon}
+            eventHandlers={{
+              click: () => onPersonClick?.(p),
+            }}
+          >
+            <Popup>
+              <div style={{ padding: "12px 16px", minWidth: 160, background: "#26262a", color: "#f0f0f2" }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: isSaved ? "#ff3b30" : "#06b6d4" }}>{p.name}</div>
+                {p.reason && (
+                  <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 4 }}>{p.reason}</div>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
     </MapContainer>
   );
 }

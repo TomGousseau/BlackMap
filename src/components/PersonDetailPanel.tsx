@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Hash, ExternalLink } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 
 interface PersonDetailPanelProps {
@@ -25,6 +25,48 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [fullscreenImage, setFullscreenImage] = useState(false);
+  const [discordTooltip, setDiscordTooltip] = useState(false);
+  const [telegramTooltip, setTelegramTooltip] = useState(false);
+  const [tooltipCount, setTooltipCount] = useState(0);
+
+  // Load tooltip count from localStorage
+  useEffect(() => {
+    const count = parseInt(localStorage.getItem('personTooltipViews') || '0', 10);
+    setTooltipCount(count);
+  }, []);
+
+  // Increment tooltip count (max 3 views)
+  const handleTooltipHover = (setter: (v: boolean) => void, show: boolean) => {
+    setter(show);
+    if (show && tooltipCount < 3) {
+      const newCount = tooltipCount + 1;
+      setTooltipCount(newCount);
+      localStorage.setItem('personTooltipViews', String(newCount));
+    }
+  };
+
+  const showTooltips = tooltipCount < 3;
+
+  // Download image handler
+  const handleDownload = async () => {
+    if (!allImages[currentImageIndex]) return;
+    try {
+      const response = await fetch(allImages[currentImageIndex]);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${location?.name || 'image'}-${currentImageIndex + 1}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      onShowStatus?.("Image downloaded!");
+    } catch {
+      onShowStatus?.("Failed to download");
+    }
+  };
 
   // Get all images
   const allImages = location ? [
@@ -147,8 +189,88 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                 >
                   <X size={14} style={{ color: "#fff" }} />
                 </button>
+                
+                {/* Fullscreen & Download buttons */}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <button
+                    onClick={() => setFullscreenImage(true)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)" }}
+                  >
+                    <Maximize2 size={14} style={{ color: "#fff" }} />
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)" }}
+                  >
+                    <Download size={14} style={{ color: "#fff" }} />
+                  </button>
+                </div>
               </div>
             )}
+
+            {/* Fullscreen image overlay */}
+            <AnimatePresence>
+              {fullscreenImage && allImages.length > 0 && (
+                <motion.div
+                  className="fixed inset-0 z-[100] flex items-center justify-center"
+                  style={{ background: "rgba(0,0,0,0.95)" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setFullscreenImage(false)}
+                >
+                  <motion.img
+                    src={allImages[currentImageIndex]}
+                    alt={location?.name}
+                    className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.9 }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <button
+                    onClick={() => setFullscreenImage(false)}
+                    className="absolute top-6 right-6 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}
+                  >
+                    <X size={20} style={{ color: "#fff" }} />
+                  </button>
+                  {/* Download in fullscreen */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDownload(); }}
+                    className="absolute top-6 left-6 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}
+                  >
+                    <Download size={20} style={{ color: "#fff" }} />
+                  </button>
+                  {/* Gallery navigation in fullscreen */}
+                  {allImages.length > 1 && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                        className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer"
+                        style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}
+                      >
+                        <ChevronLeft size={24} style={{ color: "#fff" }} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                        className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer"
+                        style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}
+                      >
+                        <ChevronRight size={24} style={{ color: "#fff" }} />
+                      </button>
+                      {/* Image counter */}
+                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full" style={{ background: "rgba(0,0,0,0.5)" }}>
+                        <span className="text-sm font-medium" style={{ color: "#fff" }}>{currentImageIndex + 1} / {allImages.length}</span>
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto" data-lenis-prevent>
@@ -172,26 +294,45 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
 
               {/* Social & Action buttons - dynamic grid based on what's available */}
               {(() => {
-                const hasSocial = location.discord || location.youtube || location.discordId || location.phone;
-                const socialCount = [location.discord, location.youtube, location.phone].filter(Boolean).length;
+                const hasSocial = location.discord || location.youtube || location.phone || location.telegram;
+                const socialCount = [location.discord, location.youtube, location.phone, location.telegram].filter(Boolean).length;
                 const baseButtons = 2; // Share + Save
                 const adminButton = isAdmin && onDelete ? 1 : 0;
                 const totalButtons = socialCount + baseButtons + adminButton;
                 const cols = Math.min(totalButtons, 5);
                 return (
                   <div className={`px-6 pb-5 grid gap-3`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-                    {/* Discord */}
+                    {/* Discord - single click = username, double click = ID */}
                     {location.discord && (
-                      <motion.button 
-                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                        style={{ background: "#232326" }}
-                        whileHover={{ scale: 1.05, background: "#5865F2" }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => navigator.clipboard.writeText(location.discord!).then(() => onShowStatus?.("Discord copied!"))}
-                      >
-                        <MessageCircle size={18} className="action-icon" />
-                        <span className="text-[11px] font-medium action-text">Discord</span>
-                      </motion.button>
+                      <div className="relative">
+                        <motion.button 
+                          className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer w-full" 
+                          style={{ background: "#232326" }}
+                          whileHover={{ scale: 1.05, background: "#5865F2" }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigator.clipboard.writeText(location.discord!).then(() => onShowStatus?.("Discord username copied!"))}
+                          onDoubleClick={() => location.discordId && navigator.clipboard.writeText(location.discordId).then(() => onShowStatus?.("Discord ID copied!"))}
+                          onMouseEnter={() => showTooltips && handleTooltipHover(setDiscordTooltip, true)}
+                          onMouseLeave={() => setDiscordTooltip(false)}
+                        >
+                          <MessageCircle size={18} className="action-icon" />
+                          <span className="text-[11px] font-medium action-text">Discord</span>
+                        </motion.button>
+                        {/* Tooltip */}
+                        <AnimatePresence>
+                          {discordTooltip && showTooltips && (
+                            <motion.div
+                              className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[9px] whitespace-nowrap z-50"
+                              style={{ background: "rgba(0,0,0,0.85)" }}
+                              initial={{ opacity: 0, y: -3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <span style={{ color: "#ccc" }}>1x user{location.discordId ? " • 2x ID" : ""}</span>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     )}
                     {/* YouTube */}
                     {location.youtube && (
@@ -213,11 +354,42 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                         style={{ background: "#232326" }}
                         whileHover={{ scale: 1.05, background: "#34C759" }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => window.open(`tel:${location.phone}`, "_self")}
+                        onClick={() => navigator.clipboard.writeText(location.phone!).then(() => onShowStatus?.("Phone copied!"))}
                       >
                         <Phone size={18} className="action-icon" />
-                        <span className="text-[11px] font-medium action-text">Call</span>
+                        <span className="text-[11px] font-medium action-text">Phone</span>
                       </motion.button>
+                    )}
+                    {/* Telegram - single click = copy @, double click also copy @ */}
+                    {location.telegram && (
+                      <div className="relative">
+                        <motion.button 
+                          className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer w-full" 
+                          style={{ background: "#232326" }}
+                          whileHover={{ scale: 1.05, background: "#0088cc" }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigator.clipboard.writeText(location.telegram!).then(() => onShowStatus?.("Telegram @ copied!"))}
+                          onMouseEnter={() => showTooltips && handleTooltipHover(setTelegramTooltip, true)}
+                          onMouseLeave={() => setTelegramTooltip(false)}
+                        >
+                          <Send size={18} className="action-icon" />
+                          <span className="text-[11px] font-medium action-text">Telegram</span>
+                        </motion.button>
+                        {/* Tooltip */}
+                        <AnimatePresence>
+                          {telegramTooltip && showTooltips && (
+                            <motion.div
+                              className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[9px] whitespace-nowrap z-50"
+                              style={{ background: "rgba(0,0,0,0.85)" }}
+                              initial={{ opacity: 0, y: -3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <span style={{ color: "#ccc" }}>Click to copy @</span>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     )}
                     {/* Share */}
                     <motion.button 
@@ -261,24 +433,6 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                   </div>
                 );
               })()}
-
-              {/* Discord ID info if available */}
-              {location.discordId && (
-                <div className="px-6 pb-4">
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#232326" }}>
-                    <Hash size={14} style={{ color: "#5865F2" }} />
-                    <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Discord ID:</span>
-                    <span className="text-xs font-mono" style={{ color: "#fff" }}>{location.discordId}</span>
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(location.discordId!).then(() => onShowStatus?.("Discord ID copied!"))}
-                      className="ml-auto text-xs cursor-pointer"
-                      style={{ color: "#5865F2" }}
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />

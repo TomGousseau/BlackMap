@@ -63,6 +63,7 @@ export interface PersonData {
   youtube?: string; // YouTube channel URL
   discordId?: string; // Discord user ID
   phone?: string; // Phone number
+  telegram?: string; // Telegram @ username
   createdAt?: string;
   approved?: boolean;
   important?: boolean;

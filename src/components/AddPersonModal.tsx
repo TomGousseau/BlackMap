@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 
@@ -33,6 +33,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [youtube, setYoutube] = useState("");
   const [discordId, setDiscordId] = useState("");
   const [phone, setPhone] = useState("");
+  const [telegram, setTelegram] = useState("");
 
   // Location input mode
   const [locationMode, setLocationMode] = useState<"address" | "coords">("address");
@@ -113,12 +114,13 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
       youtube: youtube.trim() || undefined,
       discordId: discordId.trim() || undefined,
       phone: phone.trim() || undefined,
+      telegram: telegram.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
     // Reset
     setName(""); setImageUrls([""]); setAbout("");
     setReason(""); setNotableAction(""); setWorkedFor("");
-    setDiscord(""); setYoutube(""); setDiscordId(""); setPhone("");
+    setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram("");
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -469,6 +471,22 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="Phone number"
+                          className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
+                      {/* Telegram */}
+                      <div className="relative">
+                        <Send size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#0088cc" }} />
+                        <input
+                          value={telegram}
+                          onChange={(e) => setTelegram(e.target.value)}
+                          placeholder="Telegram @ username"
                           className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
