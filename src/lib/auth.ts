@@ -1,7 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { randomBytes } from "crypto";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+// Auto-generate JWT_SECRET if not set
+const JWT_SECRET = process.env.JWT_SECRET || randomBytes(32).toString("hex");
+const secret = new TextEncoder().encode(JWT_SECRET);
 
 export async function verifyAdmin(username: string, password: string): Promise<boolean> {
   return username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD;

@@ -30,8 +30,8 @@ MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?appName=<appN
 ADMIN_USERNAME=your_admin_username
 ADMIN_PASSWORD=your_admin_password
 
-# JWT secret (generate with: openssl rand -hex 32)
-JWT_SECRET=your_jwt_secret_here
+# JWT secret (optional - auto-generated if not set)
+# JWT_SECRET=your_jwt_secret_here
 ```
 
 ### How to get each value
@@ -41,7 +41,7 @@ JWT_SECRET=your_jwt_secret_here
 | `MONGODB_URI` | Go to [MongoDB Atlas](https://cloud.mongodb.com) → your cluster → **Connect** → **Drivers** → copy the connection string. Replace `<password>` with your DB user password. |
 | `ADMIN_USERNAME` | Choose any username for admin login. |
 | `ADMIN_PASSWORD` | Choose a strong password for admin login. |
-| `JWT_SECRET` | Run `openssl rand -hex 32` in your terminal to generate a random 64-char hex string. |
+| `JWT_SECRET` | (Optional) Auto-generated if not set. Or run `openssl rand -hex 32` to create one. |
 
 > **Important:** Never commit `.env.local` to git. It's already in `.gitignore`.
 
@@ -108,7 +108,7 @@ git push -u origin main
    | `MONGODB_URI` | Your MongoDB Atlas connection string |
    | `ADMIN_USERNAME` | Your admin username |
    | `ADMIN_PASSWORD` | Your admin password |
-   | `JWT_SECRET` | Your generated JWT secret |
+   | `JWT_SECRET` | (Optional) Auto-generated if not set |
 
 7. Click **Deploy**
 
