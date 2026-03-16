@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Plus, Star, Globe, ChevronRight, X, Shield, Sparkles, Clock, User, Users } from "lucide-react";
+import { Building2, Plus, Star, Globe, ChevronRight, X, Shield, Sparkles, Clock, User, Users, Settings } from "lucide-react";
 import type { BusinessProfile, PersonData } from "@/lib/types";
 
 interface BusinessProfileButtonProps {
@@ -206,6 +206,26 @@ export function BusinessProfileButton({
                 ))
               )}
             </div>
+
+            {/* Settings section */}
+            <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />
+            <motion.button
+              className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer"
+              style={{ color: "var(--color-text)" }}
+              whileHover={{ background: "var(--color-surface-hover)" }}
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: "rgba(142, 142, 147, 0.15)" }}>
+                <Settings size={16} style={{ color: "#8e8e93" }} />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold" style={{ color: "#8e8e93" }}>Settings</div>
+                <div className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
+                  Coming soon
+                </div>
+              </div>
+              <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
+            </motion.button>
 
             {/* People section */}
             <div className="h-px mx-3" style={{ background: "var(--color-border)" }} />

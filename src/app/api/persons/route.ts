@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     workedFor: sanitizeText(body.workedFor),
     age: sanitizeText(body.age, 50),
     name: sanitizeText(body.name, 100),
+    signature: sanitizeText(body.signature, 20),
   };
   
   const result = await db.collection("persons").insertOne({

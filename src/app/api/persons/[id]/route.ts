@@ -64,6 +64,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     nationality: body.nationality || null,
     relations: body.relations || null,
     age: body.age || null,
+    signature: body.signature || null,
     status: body.status || null,
     approved: false, // Always require re-approval after edits
     updatedAt: new Date().toISOString(),

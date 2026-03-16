@@ -80,4 +80,5 @@ export interface PersonData {
   reviews?: ReviewData[];
   status?: 'Updated' | 'Terminated' | 'Outdated'; // Page status set by owner during modification
   ownerId?: string; // Owner can modify their own person page
+  signature?: string; // Creator signature (max 20 chars)
 }

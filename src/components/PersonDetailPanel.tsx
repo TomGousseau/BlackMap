@@ -295,6 +295,11 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                     <span className="text-xl">{getFlagEmoji(location.nationality)}</span>
                   )}
                 </h2>
+                {location.signature && (
+                  <p className="text-[11px] mt-1 italic" style={{ color: "var(--color-gold)", opacity: 0.8 }}>
+                    — {location.signature}
+                  </p>
+                )}
               </div>
 
               {/* Social & Action buttons - dynamic grid based on what's available */}

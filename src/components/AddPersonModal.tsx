@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown, PenTool } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 import { getNationalitySuggestions } from "@/lib/flags";
@@ -50,6 +50,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
   const [newRelationImage, setNewRelationImage] = useState("");
   const [age, setAge] = useState("");
   const [showSocialLinks, setShowSocialLinks] = useState(false);
+  const [signature, setSignature] = useState("");
 
   // Pre-fill form when editing
   useEffect(() => {
@@ -73,6 +74,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
       setNationality(personToEdit.nationality || "");
       setRelations(personToEdit.relations || []);
       setAge(personToEdit.age || "");
+      setSignature(personToEdit.signature || "");
       setManualLat(personToEdit.lat?.toString() || "");
       setManualLng(personToEdit.lng?.toString() || "");
       setLocationMode("coords");
@@ -211,6 +213,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
       nationality: nationality.trim() || undefined,
       relations: relations.length > 0 ? relations : undefined,
       age: age.trim() || undefined,
+      signature: signature.trim() || undefined,
       createdAt: editMode && personToEdit ? personToEdit.createdAt : new Date().toISOString(),
       ownerId: editMode && personToEdit ? personToEdit.ownerId : undefined,
       status: editMode ? selectedStatus : undefined,
@@ -221,7 +224,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
     setReason(""); setNotableAction(""); setWorkedFor("");
     setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
     setVk(""); setGithub(""); setSteam(""); setWebsite(""); setNationality("");
-    setRelations([]); setNewRelationName(""); setNewRelationImage(""); setAge(""); setShowSocialLinks(false); setShowAddRelation(false);
+    setRelations([]); setNewRelationName(""); setNewRelationImage(""); setAge(""); setSignature(""); setShowSocialLinks(false); setShowAddRelation(false);
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -1029,6 +1032,33 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         </motion.button>
                       </motion.div>
                     )}
+                  </div>
+
+                  {/* Signature */}
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Signature <span className="text-[10px] font-normal">(creator tag, max 20 chars)</span>
+                    </label>
+                    <div className="relative">
+                      <PenTool size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "var(--color-gold)", left: "16px", zIndex: 1 }} />
+                      <input
+                        value={signature}
+                        onChange={(e) => setSignature(e.target.value.slice(0, 20))}
+                        placeholder="Your tag..."
+                        maxLength={20}
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
+                    <div className="text-[10px] mt-1 text-right" style={{ color: signature.length >= 18 ? "#ff6961" : "var(--color-text-secondary)" }}>
+                      {signature.length}/20
+                    </div>
                   </div>
 
                   {/* Save button */}
