@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import type { LocationData } from "@/lib/types";
+import type { LocationData, PersonData } from "@/lib/types";
+import { User } from "lucide-react";
 
 const PLACEHOLDER_PHRASES = [
   "Search Maps",
@@ -45,12 +46,14 @@ function useTypingAnimation(phrases: string[], typingSpeed = 80, deletingSpeed =
 
 interface SearchBarProps {
   locations: LocationData[];
+  persons?: PersonData[];
   popularSearches: string[];
   onSelect: (location: LocationData) => void;
+  onSelectPerson?: (person: PersonData) => void;
   onSearch: (query: string) => void;
 }
 
-export function SearchBar({ locations, popularSearches, onSelect, onSearch }: SearchBarProps) {
+export function SearchBar({ locations, persons = [], popularSearches, onSelect, onSelectPerson, onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -66,6 +69,14 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
       ).slice(0, 5)
     : [];
 
+  const filteredPersons = query.trim()
+    ? persons.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query.toLowerCase()) ||
+          p.about?.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 3)
+    : [];
+
   // Simulate brief search animation when query changes
   useEffect(() => {
     if (query.trim()) {
@@ -76,7 +87,7 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
     setIsSearching(false);
   }, [query]);
 
-  const showDropdown = focused && (query.trim() === "" || filtered.length > 0);
+  const showDropdown = focused && (query.trim() === "" || filtered.length > 0 || filteredPersons.length > 0);
   const recentPlaces = [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
 
   useEffect(() => {
@@ -193,7 +204,7 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                     </div>
                   ))}
                 </div>
-              ) : query.trim() && filtered.length > 0 ? (
+              ) : query.trim() && (filtered.length > 0 || filteredPersons.length > 0) ? (
                 <div className="py-1">
                   {filtered.map((loc, idx) => (
                     <motion.button
@@ -217,6 +228,34 @@ export function SearchBar({ locations, popularSearches, onSelect, onSearch }: Se
                       <div className="min-w-0 flex-1">
                         <div className="text-[15px] font-medium truncate" style={{ color: "#000" }}>{loc.name}</div>
                         <div className="text-[13px]" style={{ color: "#8e8e93" }}>{loc.category}</div>
+                      </div>
+                    </motion.button>
+                  ))}
+                  {filteredPersons.length > 0 && filtered.length > 0 && (
+                    <div className="h-px mx-4 my-1" style={{ background: "#e5e5ea" }} />
+                  )}
+                  {filteredPersons.map((p, idx) => (
+                    <motion.button
+                      key={p.id}
+                      onClick={() => { onSelectPerson?.(p); setQuery(""); setFocused(false); }}
+                      className="w-full flex items-center gap-3 pl-5 pr-4 py-3 text-left cursor-pointer transition-colors hover:bg-[#f2f2f7]"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: (filtered.length + idx) * 0.05 }}
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ background: "#e8f0fe" }}
+                      >
+                        {p.imageUrl ? (
+                          <img src={p.imageUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <User size={18} style={{ color: "#5856d6" }} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[15px] font-medium truncate" style={{ color: "#000" }}>{p.name}</div>
+                        <div className="text-[13px]" style={{ color: "#8e8e93" }}>Person</div>
                       </div>
                     </motion.button>
                   ))}

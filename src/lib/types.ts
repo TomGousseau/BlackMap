@@ -61,4 +61,6 @@ export interface PersonData {
   createdAt?: string;
   approved?: boolean;
   important?: boolean;
+  rating?: number;
+  reviews?: ReviewData[];
 }

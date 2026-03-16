@@ -5,23 +5,16 @@ import {
   Plus,
   Minus,
   LocateFixed,
-  Compass,
-  Layers,
   Crosshair,
-  Wrench,
-  UserPlus,
 } from "lucide-react";
 
 interface MapControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onLocate: () => void;
-  devMode: boolean;
+  isAdmin: boolean;
   addingLocation: boolean;
-  addingPerson: boolean;
   onToggleAddLocation: () => void;
-  onToggleAddPerson: () => void;
-  onToggleDevMode: () => void;
 }
 
 function ControlButton({
@@ -66,12 +59,9 @@ export function MapControls({
   onZoomIn,
   onZoomOut,
   onLocate,
-  devMode,
+  isAdmin,
   addingLocation,
-  addingPerson,
   onToggleAddLocation,
-  onToggleAddPerson,
-  onToggleDevMode,
 }: MapControlsProps) {
   return (
     <div
@@ -109,18 +99,9 @@ export function MapControls({
       </div>
       <ControlButton icon={LocateFixed} onClick={onLocate} label="My location" />
 
-      {/* Dev mode toggle */}
-      <ControlButton
-        icon={Wrench}
-        onClick={onToggleDevMode}
-        label="Toggle dev mode"
-        active={devMode}
-        gold
-      />
-
-      {/* Add location (only in dev mode) */}
+      {/* Add location (admin only) */}
       <AnimatePresence>
-        {devMode && (
+        {isAdmin && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -138,25 +119,6 @@ export function MapControls({
         )}
       </AnimatePresence>
 
-      {/* Add person (only in dev mode) */}
-      <AnimatePresence>
-        {devMode && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring" as const, stiffness: 400, damping: 25, delay: 0.05 }}
-          >
-            <ControlButton
-              icon={UserPlus}
-              onClick={onToggleAddPerson}
-              label="Add person"
-              active={addingPerson}
-              gold
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

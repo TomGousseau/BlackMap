@@ -31,7 +31,6 @@ export default function HomePage() {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [locations, setLocations] = useState<LocationData[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
-  const [devMode, setDevMode] = useState(false);
   const [addingLocation, setAddingLocation] = useState(false);
   const [addingPerson, setAddingPerson] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -63,21 +62,29 @@ export default function HomePage() {
     fetch("/api/auth/check").then(r => r.json()).then(d => setIsAdmin(d.authenticated)).catch(() => {});
   }, []);
 
-  // Check URL for shared location on load
+  // Check URL for shared location/person on load
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const locId = params.get("loc");
+    const personId = params.get("person");
     if (locId) {
       const loc = locations.find(l => l.id === locId);
       if (loc) {
         setCenter([loc.lat, loc.lng]);
         setZoom(14);
         setSelectedLocation(loc);
-        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    } else if (personId) {
+      const p = persons.find(pr => pr.id === personId);
+      if (p) {
+        setCenter([p.lat, p.lng]);
+        setZoom(14);
+        setSelectedPerson(p);
         window.history.replaceState({}, "", window.location.pathname);
       }
     }
-  }, []);
+  }, [locations, persons]);
 
   const showStatus = useCallback((msg: string) => {
     setStatusMessage(msg);
@@ -88,6 +95,7 @@ export default function HomePage() {
     setCenter([loc.lat, loc.lng]);
     setZoom(14);
     setSelectedLocation(loc);
+    setSelectedPerson(null);
   }, []);
 
   const handleSearch = useCallback((query: string) => {
@@ -295,9 +303,8 @@ export default function HomePage() {
           locations={locations}
           persons={persons}
           onLocationClick={handleSelectLocation}
-          onPersonClick={(p: PersonData) => setSelectedPerson(p)}
+          onPersonClick={(p: PersonData) => { setSelectedPerson(p); setSelectedLocation(null); }}
           onMapClick={handleMapClick}
-          devMode={devMode}
           addingLocation={addingLocation}
           addingPerson={addingPerson}
           savedLocationIds={savedLocationIds}
@@ -307,8 +314,10 @@ export default function HomePage() {
       {/* Search bar */}
       <SearchBar
         locations={locations}
+        persons={persons}
         popularSearches={[]}
         onSelect={handleSelectLocation}
+        onSelectPerson={(p: PersonData) => { setSelectedPerson(p); setSelectedLocation(null); setCenter([p.lat, p.lng]); setZoom(14); }}
         onSearch={handleSearch}
       />
 
@@ -317,44 +326,15 @@ export default function HomePage() {
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onLocate={handleLocate}
-        devMode={devMode}
+        isAdmin={isAdmin}
         addingLocation={addingLocation}
-        addingPerson={addingPerson}
-        onToggleDevMode={() => {
-          setDevMode((v) => !v);
-          if (devMode) {
-            setAddingLocation(false);
-            setAddingPerson(false);
-          }
-        }}
         onToggleAddLocation={() => {
           if (!addingLocation) showStatus("Click anywhere on the map to place a location pin");
           setAddingLocation((v) => !v);
-          setAddingPerson(false);
-        }}
-        onToggleAddPerson={() => {
-          if (!addingPerson) showStatus("Click anywhere on the map to place a person pin");
-          setAddingPerson((v) => !v);
-          setAddingLocation(false);
         }}
       />
 
-      {/* Dev mode indicator */}
-      <AnimatePresence>
-        {devMode && (
-          <motion.div
-            className="fixed top-5 left-5 z-50"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <div className="glass rounded-full px-4 py-2 flex items-center gap-2 gold-border">
-              <div className="w-2 h-2 rounded-full pulse-gold" style={{ background: "var(--color-gold)" }} />
-              <span className="text-xs font-semibold gold-text">DEV MODE</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
 
       {/* Adding location indicator */}
       <AnimatePresence>
@@ -392,6 +372,7 @@ export default function HomePage() {
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}
         onSelectPerson={(p) => {
           setSelectedPerson(p);
+          setSelectedLocation(null);
           setCenter([p.lat, p.lng]);
           setZoom(14);
         }}
@@ -459,6 +440,35 @@ export default function HomePage() {
       <PersonDetailPanel
         person={selectedPerson}
         onClose={() => setSelectedPerson(null)}
+        onSave={(personId) => {
+          setSavedLocationIds((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(personId)) {
+              newSet.delete(personId);
+              showStatus("Person unsaved");
+            } else {
+              newSet.add(personId);
+              showStatus("Person saved!");
+            }
+            return newSet;
+          });
+        }}
+        onShare={(personId) => {
+          const url = `${window.location.origin}${window.location.pathname}?person=${personId}`;
+          navigator.clipboard.writeText(url).then(() => showStatus("Link copied!")).catch(() => showStatus("Failed to copy"));
+        }}
+        onDelete={(personId) => {
+          fetch(`/api/persons/${personId}`, { method: "DELETE" })
+            .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(() => {
+              setPersons((prev) => prev.filter((p) => p.id !== personId));
+              setSelectedPerson(null);
+              showStatus("Person deleted");
+            })
+            .catch(() => showStatus("Failed to delete person"));
+        }}
+        isSaved={selectedPerson ? savedLocationIds.has(selectedPerson.id) : false}
+        isAdmin={isAdmin}
       />
 
       {/* Admin login modal */}

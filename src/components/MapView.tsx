@@ -39,7 +39,6 @@ interface MapViewProps {
   onLocationClick?: (loc: LocationData) => void;
   onPersonClick?: (person: PersonData) => void;
   onMapClick?: (lat: number, lng: number) => void;
-  devMode?: boolean;
   addingLocation?: boolean;
   addingPerson?: boolean;
   savedLocationIds?: Set<string>;
@@ -172,7 +171,6 @@ export function MapView({
   onLocationClick,
   onPersonClick,
   onMapClick,
-  devMode,
   addingLocation,
   addingPerson,
   savedLocationIds = new Set(),
