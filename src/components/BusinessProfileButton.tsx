@@ -228,7 +228,7 @@ export function BusinessProfileButton({
                 </motion.button>
               )}
             </div>
-            <div className="max-h-48 overflow-y-auto p-2" data-lenis-prevent>
+            <div className="max-h-48 overflow-y-auto p-2 pb-4" data-lenis-prevent>
               {persons.length === 0 ? (
                 <div className="py-4 text-center">
                   <User size={22} style={{ color: "var(--color-text-secondary)", margin: "0 auto 6px" }} />
