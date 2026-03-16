@@ -47,6 +47,8 @@ export default function HomePage() {
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [pendingPersonCoords, setPendingPersonCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPerson, setSelectedPerson] = useState<PersonData | null>(null);
+  const [editPersonData, setEditPersonData] = useState<PersonData | null>(null);
+  const [editPersonStatus, setEditPersonStatus] = useState<'Updated' | 'Terminated' | 'Outdated' | null>(null);
 
   // Lenis smooth scroll
   useEffect(() => {
@@ -257,6 +259,46 @@ export default function HomePage() {
       );
     }).catch(() => {});
   }, [persons]);
+
+  // Open edit modal for a person with selected status
+  const handleModifyPerson = useCallback((person: PersonData, status: 'Updated' | 'Terminated' | 'Outdated') => {
+    setEditPersonData(person);
+    setEditPersonStatus(status);
+    if (status === 'Updated') {
+      // Show edit form for Updated status
+      setShowAddPerson(true);
+    } else {
+      // For Terminated/Outdated, just update the status directly
+      fetch(`/api/persons/${person.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, approved: false }),
+      }).then(() => {
+        setPersons((prev) =>
+          prev.map((p) => (p.id === person.id ? { ...p, status, approved: false } : p))
+        );
+        setSelectedPerson((prev) => prev && prev.id === person.id ? { ...prev, status, approved: false } : prev);
+        showStatus(`Status set to "${status}" - pending approval`);
+        setEditPersonData(null);
+        setEditPersonStatus(null);
+      }).catch(() => showStatus("Failed to update status"));
+    }
+  }, [showStatus]);
+
+  // Handle saving updated person (edit mode)
+  const handleUpdatePerson = useCallback((person: PersonData) => {
+    fetch(`/api/persons/${person.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(person),
+    }).then(r => r.json()).then((updated) => {
+      setPersons((prev) => prev.map((p) => (p.id === person.id ? updated : p)));
+      setSelectedPerson(updated);
+      showStatus(`"${person.name}" updated - pending re-approval`);
+      setEditPersonData(null);
+      setEditPersonStatus(null);
+    }).catch(() => showStatus("Failed to update person"));
+  }, [showStatus]);
 
   const handleAddBusinessReview = useCallback((bizId: string, review: BusinessReview) => {
     fetch(`/api/businesses/${bizId}/reviews`, {
@@ -471,9 +513,17 @@ export default function HomePage() {
       {/* Add person modal */}
       <AddPersonModal
         isOpen={showAddPerson}
-        onClose={() => { setShowAddPerson(false); setPendingPersonCoords(null); }}
-        onSave={handleSavePerson}
+        onClose={() => { 
+          setShowAddPerson(false); 
+          setPendingPersonCoords(null); 
+          setEditPersonData(null); 
+          setEditPersonStatus(null); 
+        }}
+        onSave={editPersonData ? handleUpdatePerson : handleSavePerson}
         pendingCoords={pendingPersonCoords}
+        editMode={!!editPersonData}
+        personToEdit={editPersonData}
+        selectedStatus={editPersonStatus || undefined}
       />
 
       {/* Person detail panel */}
@@ -541,6 +591,7 @@ export default function HomePage() {
         isSaved={selectedPerson ? savedLocationIds.has(selectedPerson.id) : false}
         isAdmin={isAdmin}
         onShowStatus={showStatus}
+        onModifyPerson={handleModifyPerson}
       />
 
       {/* Admin login modal */}

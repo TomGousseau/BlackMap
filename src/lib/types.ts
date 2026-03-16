@@ -78,4 +78,6 @@ export interface PersonData {
   verified?: boolean; // Admin-verified person
   rating?: number; // Admin quality rating (1-5)
   reviews?: ReviewData[];
+  status?: 'Updated' | 'Terminated' | 'Outdated'; // Page status set by owner during modification
+  ownerId?: string; // Owner can modify their own person page
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github, User } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github, User, Edit3, RefreshCw, XCircle, Clock } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 import { getFlagEmoji } from "@/lib/flags";
 import { truncateText } from "@/lib/sanitize";
@@ -17,12 +17,13 @@ interface PersonDetailPanelProps {
   onShare?: (personId: string) => void;
   onDelete?: (personId: string) => void;
   onShowStatus?: (msg: string) => void;
+  onModifyPerson?: (person: PersonData, status: 'Updated' | 'Terminated' | 'Outdated') => void;
   isAdmin?: boolean;
   isSaved?: boolean;
   currentUserId?: string;
 }
 
-export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, onToggleVerified, onSave, onShare, onDelete, onShowStatus, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
+export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, onToggleVerified, onSave, onShare, onDelete, onShowStatus, onModifyPerson, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
   const location = person;
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -31,6 +32,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
   const [discordTooltip, setDiscordTooltip] = useState(false);
   const [telegramTooltip, setTelegramTooltip] = useState(false);
   const [tooltipCount, setTooltipCount] = useState(0);
+  const [showStatusSelection, setShowStatusSelection] = useState(false);
 
   // Load tooltip count from localStorage
   useEffect(() => {
@@ -492,6 +494,48 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                       </motion.button>
                     )}
                   </div>
+
+                  {/* Modify button - always visible for person pages */}
+                  {onModifyPerson && (
+                    <div className="px-6 mt-3">
+                      <motion.button 
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl cursor-pointer"
+                        style={{ background: "rgba(6, 182, 212, 0.15)", border: "1px solid rgba(6, 182, 212, 0.3)" }}
+                        whileHover={{ scale: 1.02, background: "rgba(6, 182, 212, 0.25)" }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowStatusSelection(true)}
+                      >
+                        <Edit3 size={16} style={{ color: "#06b6d4" }} />
+                        <span className="text-sm font-semibold" style={{ color: "#06b6d4" }}>Modify</span>
+                      </motion.button>
+                    </div>
+                  )}
+
+                  {/* Status badge if exists */}
+                  {location.status && (
+                    <div className="px-6 mt-3">
+                      <div 
+                        className="flex items-center justify-center gap-2 py-2 rounded-xl"
+                        style={{ 
+                          background: location.status === 'Updated' ? 'rgba(52, 199, 89, 0.15)' : 
+                                     location.status === 'Terminated' ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 149, 0, 0.15)'
+                        }}
+                      >
+                        {location.status === 'Updated' && <RefreshCw size={14} style={{ color: '#34c759' }} />}
+                        {location.status === 'Terminated' && <XCircle size={14} style={{ color: '#ff3b30' }} />}
+                        {location.status === 'Outdated' && <Clock size={14} style={{ color: '#ff9500' }} />}
+                        <span 
+                          className="text-xs font-bold"
+                          style={{ 
+                            color: location.status === 'Updated' ? '#34c759' : 
+                                   location.status === 'Terminated' ? '#ff3b30' : '#ff9500'
+                          }}
+                        >
+                          {location.status}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                   </>
                 );
               })()}
@@ -692,6 +736,121 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                   </div>
                 </>
               )}
+
+            {/* Status Selection Modal */}
+            <AnimatePresence>
+              {showStatusSelection && location && (
+                <motion.div
+                  className="fixed inset-0 z-[110] flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <motion.div
+                    className="absolute inset-0"
+                    style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}
+                    onClick={() => setShowStatusSelection(false)}
+                  />
+                  <motion.div
+                    className="relative w-full max-w-xs rounded-3xl overflow-hidden"
+                    style={{ background: "#1c1c1e", boxShadow: "0 25px 80px rgba(0,0,0,0.8)" }}
+                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    {/* Cyan accent bar */}
+                    <div className="h-1" style={{ background: "linear-gradient(90deg, #06b6d4, #22d3ee)" }} />
+                    
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-lg font-bold" style={{ color: "#fff" }}>Select Status</h3>
+                        <motion.button
+                          onClick={() => setShowStatusSelection(false)}
+                          className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                          style={{ background: "rgba(255,255,255,0.1)" }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <X size={14} style={{ color: "#8e8e93" }} />
+                        </motion.button>
+                      </div>
+                      
+                      <p className="text-sm mb-5" style={{ color: "#8e8e93" }}>
+                        Choose what changed for this person
+                      </p>
+                      
+                      <div className="space-y-3">
+                        {/* Updated */}
+                        <motion.button
+                          onClick={() => {
+                            setShowStatusSelection(false);
+                            onModifyPerson?.(location, 'Updated');
+                          }}
+                          className="w-full flex items-center gap-3 p-4 rounded-2xl cursor-pointer"
+                          style={{ background: "rgba(52, 199, 89, 0.1)", border: "1px solid rgba(52, 199, 89, 0.3)" }}
+                          whileHover={{ scale: 1.02, background: "rgba(52, 199, 89, 0.2)" }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <RefreshCw size={20} style={{ color: "#34c759" }} />
+                          <div className="text-left">
+                            <span className="text-sm font-semibold block" style={{ color: "#34c759" }}>Updated</span>
+                            <span className="text-[11px]" style={{ color: "#8e8e93" }}>Edit information</span>
+                          </div>
+                        </motion.button>
+                        
+                        {/* Terminated */}
+                        <motion.button
+                          onClick={() => {
+                            setShowStatusSelection(false);
+                            onModifyPerson?.(location, 'Terminated');
+                          }}
+                          className="w-full flex items-center gap-3 p-4 rounded-2xl cursor-pointer"
+                          style={{ background: "rgba(255, 59, 48, 0.1)", border: "1px solid rgba(255, 59, 48, 0.3)" }}
+                          whileHover={{ scale: 1.02, background: "rgba(255, 59, 48, 0.2)" }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <XCircle size={20} style={{ color: "#ff3b30" }} />
+                          <div className="text-left">
+                            <span className="text-sm font-semibold block" style={{ color: "#ff3b30" }}>Terminated</span>
+                            <span className="text-[11px]" style={{ color: "#8e8e93" }}>No longer active</span>
+                          </div>
+                        </motion.button>
+                        
+                        {/* Outdated */}
+                        <motion.button
+                          onClick={() => {
+                            setShowStatusSelection(false);
+                            onModifyPerson?.(location, 'Outdated');
+                          }}
+                          className="w-full flex items-center gap-3 p-4 rounded-2xl cursor-pointer"
+                          style={{ background: "rgba(255, 149, 0, 0.1)", border: "1px solid rgba(255, 149, 0, 0.3)" }}
+                          whileHover={{ scale: 1.02, background: "rgba(255, 149, 0, 0.2)" }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Clock size={20} style={{ color: "#ff9500" }} />
+                          <div className="text-left">
+                            <span className="text-sm font-semibold block" style={{ color: "#ff9500" }}>Outdated</span>
+                            <span className="text-[11px]" style={{ color: "#8e8e93" }}>Info needs refresh</span>
+                          </div>
+                        </motion.button>
+                      </div>
+                      
+                      {/* Cancel button */}
+                      <motion.button
+                        onClick={() => setShowStatusSelection(false)}
+                        className="w-full mt-4 py-3 rounded-2xl text-sm font-semibold cursor-pointer"
+                        style={{ background: "rgba(255,255,255,0.1)", color: "#8e8e93" }}
+                        whileHover={{ background: "rgba(255,255,255,0.15)" }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Cancel
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
               <div className="h-6" />
             </div>

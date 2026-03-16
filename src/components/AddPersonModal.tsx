@@ -20,9 +20,12 @@ interface AddPersonModalProps {
   onClose: () => void;
   onSave: (person: PersonData) => void;
   pendingCoords: { lat: number; lng: number } | null;
+  editMode?: boolean;
+  personToEdit?: PersonData | null;
+  selectedStatus?: 'Updated' | 'Terminated' | 'Outdated';
 }
 
-export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPersonModalProps) {
+export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMode = false, personToEdit, selectedStatus }: AddPersonModalProps) {
   const [name, setName] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
   const [about, setAbout] = useState("");
@@ -47,6 +50,34 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [newRelationImage, setNewRelationImage] = useState("");
   const [age, setAge] = useState("");
   const [showSocialLinks, setShowSocialLinks] = useState(false);
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editMode && personToEdit) {
+      setName(personToEdit.name || "");
+      setImageUrls(personToEdit.imageUrls?.length ? personToEdit.imageUrls : [personToEdit.imageUrl || ""]);
+      setAbout(personToEdit.about || "");
+      setReason(personToEdit.reason || "");
+      setNotableAction(personToEdit.notableAction || "");
+      setWorkedFor(personToEdit.workedFor || "");
+      setDiscord(personToEdit.discord || "");
+      setYoutube(personToEdit.youtube || "");
+      setDiscordId(personToEdit.discordId || "");
+      setPhone(personToEdit.phone || "");
+      setTelegram(personToEdit.telegram || "");
+      setTelegramId(personToEdit.telegramId || "");
+      setVk(personToEdit.vk || "");
+      setGithub(personToEdit.github || "");
+      setSteam(personToEdit.steam || "");
+      setWebsite(personToEdit.website || "");
+      setNationality(personToEdit.nationality || "");
+      setRelations(personToEdit.relations || []);
+      setAge(personToEdit.age || "");
+      setManualLat(personToEdit.lat?.toString() || "");
+      setManualLng(personToEdit.lng?.toString() || "");
+      setLocationMode("coords");
+    }
+  }, [editMode, personToEdit]);
 
   // Nationality suggestions
   const [nationalitySuggestions, setNationalitySuggestions] = useState<{ name: string; emoji: string }[]>([]);
@@ -157,7 +188,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     if (!name.trim() || !finalCoords) return;
     const validImages = imageUrls.filter(url => url.trim());
     onSave({
-      id: `person-${Date.now()}`,
+      id: editMode && personToEdit ? personToEdit.id : `person-${Date.now()}`,
       name: name.trim(),
       lat: finalCoords.lat,
       lng: finalCoords.lng,
@@ -180,7 +211,10 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
       nationality: nationality.trim() || undefined,
       relations: relations.length > 0 ? relations : undefined,
       age: age.trim() || undefined,
-      createdAt: new Date().toISOString(),
+      createdAt: editMode && personToEdit ? personToEdit.createdAt : new Date().toISOString(),
+      ownerId: editMode && personToEdit ? personToEdit.ownerId : undefined,
+      status: editMode ? selectedStatus : undefined,
+      approved: editMode ? false : undefined, // Edits require re-approval
     });
     // Reset
     setName(""); setImageUrls([""]); setAbout("");
@@ -226,7 +260,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                       style={{ background: "rgba(6, 182, 212, 0.15)" }}>
                       <User size={20} style={{ color: "#06b6d4" }} />
                     </div>
-                    <h2 className="text-lg font-bold" style={{ color: "#06b6d4" }}>Add Person</h2>
+                    <h2 className="text-lg font-bold" style={{ color: "#06b6d4" }}>{editMode ? "Edit Person" : "Add Person"}</h2>
                   </div>
                   <motion.button
                     onClick={onClose}
@@ -239,8 +273,26 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                   </motion.button>
                 </div>
 
-                {/* Location input - show if no pendingCoords from map click */}
-                {!pendingCoords && (
+                {/* Status badge when editing */}
+                {editMode && selectedStatus && (
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>Status:</span>
+                    <span 
+                      className="px-3 py-1 rounded-full text-xs font-bold"
+                      style={{ 
+                        background: selectedStatus === 'Updated' ? 'rgba(52, 199, 89, 0.15)' : 
+                                   selectedStatus === 'Terminated' ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 149, 0, 0.15)',
+                        color: selectedStatus === 'Updated' ? '#34c759' : 
+                               selectedStatus === 'Terminated' ? '#ff3b30' : '#ff9500'
+                      }}
+                    >
+                      {selectedStatus}
+                    </span>
+                  </div>
+                )}
+
+                {/* Location input - show if no pendingCoords from map click (or in edit mode) */}
+                {(!pendingCoords || editMode) && (
                   <div className="mb-5">
                     <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--color-text-secondary)" }}>
                       Location *
@@ -993,8 +1045,13 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     whileHover={{ scale: 1.02, boxShadow: "0 8px 25px rgba(6, 182, 212, 0.5)" }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    Add Person
+                    {editMode ? "Save Changes" : "Add Person"}
                   </motion.button>
+                  {editMode && (
+                    <p className="text-xs text-center" style={{ color: "var(--color-text-secondary)" }}>
+                      Changes will require admin re-approval
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
