@@ -163,6 +163,88 @@ function ZoomAwareMarkers({
   );
 }
 
+// Zoom-aware person markers - same behavior as locations
+function ZoomAwarePersonMarkers({ 
+  persons, 
+  onPersonClick,
+  requireZoom,
+  savedIds 
+}: { 
+  persons: PersonData[]; 
+  onPersonClick?: (person: PersonData) => void;
+  requireZoom: boolean;
+  savedIds: Set<string>;
+}) {
+  const map = useMap();
+  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
+  const [bounds, setBounds] = useState(map.getBounds());
+
+  useMapEvents({
+    zoomend: () => {
+      setCurrentZoom(map.getZoom());
+      setBounds(map.getBounds());
+    },
+    moveend: () => {
+      setBounds(map.getBounds());
+    },
+  });
+
+  const visiblePersons = useMemo(() => {
+    if (!requireZoom) return persons;
+    
+    return persons.filter(p => {
+      if (savedIds.has(p.id)) return true;
+      if (currentZoom < MIN_ZOOM_FOR_MARKERS) return false;
+      return bounds.contains([p.lat, p.lng]);
+    });
+  }, [persons, requireZoom, currentZoom, bounds, savedIds]);
+
+  return (
+    <>
+      {visiblePersons.map((p) => {
+        const isSaved = savedIds.has(p.id);
+        const icon = isSaved ? redIcon : (p.important ? purpleIcon : cyanIcon);
+        
+        return (
+          <Marker
+            key={p.id}
+            position={[p.lat, p.lng]}
+            icon={icon}
+            eventHandlers={{
+              click: () => onPersonClick?.(p),
+            }}
+          >
+            <Popup>
+              <div style={{ padding: "12px 16px", minWidth: 180, background: "#26262a", color: "#f0f0f2" }}>
+                {p.imageUrl && (
+                  <div style={{
+                    width: "100%", height: 100, borderRadius: 12,
+                    overflow: "hidden", marginBottom: 8
+                  }}>
+                    <img src={p.imageUrl} alt={p.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
+                )}
+                <div style={{ fontWeight: 600, fontSize: 14, color: isSaved ? "#ff3b30" : "#06b6d4" }}>{p.name}</div>
+                {p.reason && (
+                  <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 2 }}>{p.reason}</div>
+                )}
+                {p.rating ? (
+                  <div style={{ fontSize: 12, marginTop: 4, color: "#d4b85c" }}>
+                    {"★".repeat(Math.floor(p.rating))} {p.rating}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 11, marginTop: 4, color: "#8e8e93" }}>Unreviewed</div>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
+    </>
+  );
+}
+
 export function MapView({
   center,
   zoom,
@@ -175,9 +257,9 @@ export function MapView({
   addingPerson,
   savedLocationIds = new Set(),
 }: MapViewProps) {
-  // Check once if we need zoom-to-reveal mode (200+ locations)
-  // Empty deps = only checked on first render
+  // Check once if we need zoom-to-reveal mode (200+ items)
   const [requireZoom] = useState(() => locations.length >= 200);
+  const [requireZoomPersons] = useState(() => persons.length >= 200);
 
   return (
     <MapContainer
@@ -209,29 +291,12 @@ export function MapView({
         requireZoom={requireZoom}
         savedLocationIds={savedLocationIds}
       />
-      {/* Person markers */}
-      {persons.map((p) => {
-        const isSaved = savedLocationIds.has(p.id);
-        return (
-          <Marker
-            key={p.id}
-            position={[p.lat, p.lng]}
-            icon={isSaved ? redIcon : cyanIcon}
-            eventHandlers={{
-              click: () => onPersonClick?.(p),
-            }}
-          >
-            <Popup>
-              <div style={{ padding: "12px 16px", minWidth: 160, background: "#26262a", color: "#f0f0f2" }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: isSaved ? "#ff3b30" : "#06b6d4" }}>{p.name}</div>
-                {p.reason && (
-                  <div style={{ fontSize: 11, color: "#8e8e93", marginTop: 4 }}>{p.reason}</div>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
+      <ZoomAwarePersonMarkers 
+        persons={persons} 
+        onPersonClick={onPersonClick} 
+        requireZoom={requireZoomPersons}
+        savedIds={savedLocationIds}
+      />
     </MapContainer>
   );
 }
