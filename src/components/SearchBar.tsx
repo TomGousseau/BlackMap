@@ -113,8 +113,19 @@ export function SearchBar({ locations, persons = [], popularSearches, onSelect, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onSearch(query.trim());
-      setFocused(false);
+      // If there are results, select the first one
+      if (filtered.length > 0) {
+        onSelect(filtered[0]);
+        setQuery("");
+        setFocused(false);
+      } else if (filteredPersons.length > 0) {
+        onSelectPerson?.(filteredPersons[0]);
+        setQuery("");
+        setFocused(false);
+      } else {
+        onSearch(query.trim());
+        setFocused(false);
+      }
     }
   };
 

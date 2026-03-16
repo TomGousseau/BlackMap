@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Shield, Check, X as XIcon, Building2, User } from "lucide-react";
+import { X, Shield, Check, X as XIcon, Building2, User, Zap } from "lucide-react";
 import type { BusinessProfile, PersonData } from "@/lib/types";
 
 interface AdminPanelProps {
@@ -27,6 +27,21 @@ export function AdminPanel({
 }: AdminPanelProps) {
   const pendingBusinesses = businesses.filter((b) => !b.approved);
   const pendingPersons = persons.filter((p) => !p.approved);
+
+  // Auto refuse spam - age > 150 years
+  const autoRefuseSpam = () => {
+    let refusedCount = 0;
+    pendingPersons.forEach((p) => {
+      if (p.age) {
+        const ageNum = parseInt(p.age, 10);
+        if (!isNaN(ageNum) && ageNum > 150) {
+          onRejectPerson(p.id);
+          refusedCount++;
+        }
+      }
+    });
+    return refusedCount;
+  };
 
   return (
     <AnimatePresence>
@@ -73,15 +88,32 @@ export function AdminPanel({
                   </p>
                 </div>
               </div>
-              <motion.button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-                style={{ background: "var(--color-surface-hover)" }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <X size={14} style={{ color: "var(--color-text-secondary)" }} />
-              </motion.button>
+              
+              {/* Auto Refuse Spam Button */}
+              <div className="flex items-center gap-2">
+                <motion.button
+                  onClick={() => {
+                    const count = autoRefuseSpam();
+                    // Optional: could show a toast here
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+                  style={{ background: "rgba(255, 149, 0, 0.15)", color: "#FF9500" }}
+                  whileHover={{ scale: 1.05, background: "#FF9500", color: "#000" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Zap size={14} />
+                  Auto Refuse Spam
+                </motion.button>
+                <motion.button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                  style={{ background: "var(--color-surface-hover)" }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={14} style={{ color: "var(--color-text-secondary)" }} />
+                </motion.button>
+              </div>
             </div>
 
             {/* Content */}

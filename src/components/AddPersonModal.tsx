@@ -482,6 +482,9 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     )}
                   </div>
 
+                  {/* Separator */}
+                  <div className="h-[1px] my-2" style={{ background: "var(--color-border)" }} />
+
                   {/* Social Links Section - Collapsible */}
                   <div>
                     <motion.button
