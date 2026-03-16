@@ -328,17 +328,22 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Name *
                     </label>
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. John Smith"
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                        style={{ color: "#06b6d4" }} />
+                      <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="e.g. John Smith"
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "44px",
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Multiple Image URLs */}
@@ -350,8 +355,8 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                       {imageUrls.map((url, idx) => (
                         <div key={idx} className="flex gap-2">
                           <div className="relative flex-1">
-                            <ImagePlus size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                              style={{ color: "var(--color-text-secondary)" }} />
+                            <ImagePlus size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                              style={{ color: "#06b6d4" }} />
                             <input
                               value={url}
                               onChange={(e) => {
@@ -360,12 +365,12 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                                 setImageUrls(newUrls);
                               }}
                               placeholder="https://example.com/photo.jpg"
-                              className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                              className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
                               style={{
                                 background: "var(--color-surface)",
                                 color: "var(--color-text)",
                                 border: "1px solid var(--color-border)",
-                                paddingLeft: "44px",
+                                paddingLeft: "48px",
                               }}
                             />
                           </div>
@@ -373,7 +378,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             <motion.button
                               type="button"
                               onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== idx))}
-                              className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer"
+                              className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer"
                               style={{ background: "var(--color-surface)" }}
                               whileHover={{ scale: 1.05, background: "#ff3b30" }}
                               whileTap={{ scale: 0.95 }}

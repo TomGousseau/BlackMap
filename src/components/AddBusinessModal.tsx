@@ -102,62 +102,74 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
               <div className="space-y-4">
                 {/* Name (required) */}
                 <div>
-                  <label className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <Building2 size={12} />
+                  <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                     Business Name <span style={{ color: "var(--color-gold)" }}>*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Blackrock Corp"
-                    className="w-full py-2.5 px-3.5 rounded-xl text-sm outline-none"
-                    style={{
-                      background: "var(--color-surface)",
-                      color: "var(--color-text)",
-                      border: "1px solid var(--color-border)",
-                    }}
-                  />
+                  <div className="relative">
+                    <Building2 size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                      style={{ color: "var(--color-gold)" }} />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Blackrock Corp"
+                      className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                      style={{
+                        background: "var(--color-surface)",
+                        color: "var(--color-text)",
+                        border: "1px solid var(--color-border)",
+                        paddingLeft: "44px",
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* Website (optional) */}
                 <div>
-                  <label className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <Globe size={12} />
+                  <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                     Website <span className="text-[10px] font-normal">(optional)</span>
                   </label>
-                  <input
-                    type="url"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://example.com"
-                    className="w-full py-2.5 px-3.5 rounded-xl text-sm outline-none"
-                    style={{
-                      background: "var(--color-surface)",
-                      color: "var(--color-text)",
-                      border: "1px solid var(--color-border)",
-                    }}
-                  />
+                  <div className="relative">
+                    <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                      style={{ color: "#3b82f6" }} />
+                    <input
+                      type="url"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://example.com"
+                      className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                      style={{
+                        background: "var(--color-surface)",
+                        color: "var(--color-text)",
+                        border: "1px solid var(--color-border)",
+                        paddingLeft: "44px",
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* Image URL (optional) */}
                 <div>
-                  <label className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <ImageIcon size={12} />
+                  <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                     Logo / Image URL <span className="text-[10px] font-normal">(optional)</span>
                   </label>
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://example.com/logo.png"
-                    className="w-full py-2.5 px-3.5 rounded-xl text-sm outline-none"
-                    style={{
-                      background: "var(--color-surface)",
-                      color: "var(--color-text)",
-                      border: "1px solid var(--color-border)",
-                    }}
-                  />
+                  <div className="relative">
+                    <ImageIcon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                      style={{ color: "#06b6d4" }} />
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://example.com/logo.png"
+                      className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                      style={{
+                        background: "var(--color-surface)",
+                        color: "var(--color-text)",
+                        border: "1px solid var(--color-border)",
+                        paddingLeft: "48px",
+                      }}
+                    />
+                  </div>
                   {/* Preview */}
                   {imageUrl.trim() && (
                     <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden" style={{ background: "var(--color-surface)" }}>
@@ -169,8 +181,7 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
 
                 {/* Category (optional) */}
                 <div>
-                  <label className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <Tag size={12} />
+                  <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                     Category <span className="text-[10px] font-normal">(optional)</span>
                   </label>
                   <div className="flex flex-wrap gap-1.5">
@@ -193,8 +204,7 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
 
                 {/* Description (optional) */}
                 <div>
-                  <label className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <FileText size={12} />
+                  <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                     Description <span className="text-[10px] font-normal">(optional)</span>
                   </label>
                   <textarea
@@ -202,7 +212,7 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="What does this business do?"
                     rows={3}
-                    className="w-full py-2.5 px-3.5 rounded-xl text-sm outline-none resize-none"
+                    className="w-full py-3 px-4 rounded-2xl text-sm outline-none resize-none"
                     style={{
                       background: "var(--color-surface)",
                       color: "var(--color-text)",
