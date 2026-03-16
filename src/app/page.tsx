@@ -446,10 +446,8 @@ export default function HomePage() {
         persons={persons}
         onApprove={handleApproveBusiness}
         onReject={handleRejectBusiness}
-        onToggleImportant={handleToggleImportant}
         onApprovePerson={handleApprovePerson}
         onRejectPerson={handleRejectPerson}
-        onTogglePersonImportant={handleTogglePersonImportant}
       />
 
       {/* Place detail */}

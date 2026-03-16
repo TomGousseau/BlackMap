@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Shield, Check, X as XIcon, Star, Building2, Sparkles, User } from "lucide-react";
+import { X, Shield, Check, X as XIcon, Building2, User } from "lucide-react";
 import type { BusinessProfile, PersonData } from "@/lib/types";
 
 interface AdminPanelProps {
@@ -11,10 +11,8 @@ interface AdminPanelProps {
   persons: PersonData[];
   onApprove: (bizId: string) => void;
   onReject: (bizId: string) => void;
-  onToggleImportant: (bizId: string) => void;
   onApprovePerson: (personId: string) => void;
   onRejectPerson: (personId: string) => void;
-  onTogglePersonImportant: (personId: string) => void;
 }
 
 export function AdminPanel({
@@ -24,15 +22,11 @@ export function AdminPanel({
   persons,
   onApprove,
   onReject,
-  onToggleImportant,
   onApprovePerson,
   onRejectPerson,
-  onTogglePersonImportant,
 }: AdminPanelProps) {
   const pendingBusinesses = businesses.filter((b) => !b.approved);
-  const approvedBusinesses = businesses.filter((b) => b.approved);
   const pendingPersons = persons.filter((p) => !p.approved);
-  const approvedPersons = persons.filter((p) => p.approved);
 
   return (
     <AnimatePresence>
@@ -92,7 +86,7 @@ export function AdminPanel({
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-6 pb-6" data-lenis-prevent>
-              {/* Pending Approval Section */}
+              {/* Pending Businesses Section */}
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <h3 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
@@ -179,86 +173,8 @@ export function AdminPanel({
                 )}
               </div>
 
-              {/* Approved Businesses Section */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text)" }}>
-                  Approved Businesses ({approvedBusinesses.length})
-                </h3>
-
-                {approvedBusinesses.length === 0 ? (
-                  <div className="py-8 text-center rounded-2xl" style={{ background: "var(--color-surface)" }}>
-                    <Building2 size={24} style={{ color: "var(--color-text-secondary)", margin: "0 auto 8px" }} />
-                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      No approved businesses yet
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {approvedBusinesses.map((biz) => (
-                      <motion.div
-                        key={biz.id}
-                        className="p-4 rounded-2xl flex items-center gap-4"
-                        style={{ background: "var(--color-surface)" }}
-                      >
-                        {/* Avatar */}
-                        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
-                          style={{ background: "var(--color-surface-hover)" }}>
-                          {biz.imageUrl ? (
-                            <img src={biz.imageUrl} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <Building2 size={20} style={{ color: "var(--color-gold)" }} />
-                          )}
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold truncate" style={{ color: "var(--color-text)" }}>
-                              {biz.name}
-                            </span>
-                            {biz.important && (
-                              <Sparkles size={14} style={{ color: "#af52de" }} />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            {biz.category && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full"
-                                style={{ background: "rgba(200,168,78,0.15)", color: "var(--color-gold)" }}>
-                                {biz.category}
-                              </span>
-                            )}
-                            <div className="flex items-center gap-0.5">
-                              <Star size={10} fill="var(--color-gold)" style={{ color: "var(--color-gold)" }} />
-                              <span className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
-                                {biz.reputation.toFixed(1)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Toggle Important */}
-                        <motion.button
-                          onClick={() => onToggleImportant(biz.id)}
-                          className="px-3 py-2 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-medium"
-                          style={{
-                            background: biz.important ? "rgba(175, 82, 222, 0.2)" : "var(--color-surface-hover)",
-                            color: biz.important ? "#af52de" : "var(--color-text-secondary)",
-                            border: biz.important ? "1px solid rgba(175, 82, 222, 0.3)" : "1px solid transparent",
-                          }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Sparkles size={14} />
-                          {biz.important ? "Important" : "Mark Important"}
-                        </motion.button>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {/* Pending Persons Section */}
-              <div className="mb-6">
+              <div>
                 <div className="flex items-center gap-2 mb-3">
                   <h3 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
                     Pending People
@@ -334,80 +250,6 @@ export function AdminPanel({
                             <Check size={16} style={{ color: "#34c759" }} />
                           </motion.button>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Approved Persons Section */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text)" }}>
-                  Approved People ({approvedPersons.length})
-                </h3>
-
-                {approvedPersons.length === 0 ? (
-                  <div className="py-8 text-center rounded-2xl" style={{ background: "var(--color-surface)" }}>
-                    <User size={24} style={{ color: "var(--color-text-secondary)", margin: "0 auto 8px" }} />
-                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      No approved people yet
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {approvedPersons.map((p) => (
-                      <motion.div
-                        key={p.id}
-                        className="p-4 rounded-2xl flex items-center gap-4"
-                        style={{ background: "var(--color-surface)" }}
-                      >
-                        {/* Avatar */}
-                        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 flex items-center justify-center"
-                          style={{ background: "var(--color-surface-hover)" }}>
-                          {p.imageUrl ? (
-                            <img src={p.imageUrl} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <User size={20} style={{ color: "#06b6d4" }} />
-                          )}
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold truncate" style={{ color: "var(--color-text)" }}>
-                              {p.name}
-                            </span>
-                            {p.important && (
-                              <Sparkles size={14} style={{ color: "#06b6d4" }} />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            {p.rating && (
-                              <div className="flex items-center gap-0.5">
-                                <Star size={10} fill="var(--color-gold)" style={{ color: "var(--color-gold)" }} />
-                                <span className="text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
-                                  {p.rating}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Toggle Important */}
-                        <motion.button
-                          onClick={() => onTogglePersonImportant(p.id)}
-                          className="px-3 py-2 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-medium"
-                          style={{
-                            background: p.important ? "rgba(6, 182, 212, 0.2)" : "var(--color-surface-hover)",
-                            color: p.important ? "#06b6d4" : "var(--color-text-secondary)",
-                            border: p.important ? "1px solid rgba(6, 182, 212, 0.3)" : "1px solid transparent",
-                          }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Sparkles size={14} />
-                          {p.important ? "Important" : "Mark Important"}
-                        </motion.button>
                       </motion.div>
                     ))}
                   </div>
