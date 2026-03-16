@@ -89,15 +89,21 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
     setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
-  // Close on Escape key
+  // Close on Escape key - fullscreen first, then panel
   useEffect(() => {
     if (!location) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        if (fullscreenImage) {
+          setFullscreenImage(false);
+        } else {
+          onClose();
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [location, onClose]);
+  }, [location, onClose, fullscreenImage]);
 
   const canSubmit = isAdmin && reviewRating > 0;
 
@@ -287,13 +293,6 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                     <span className="text-xl">{getFlagEmoji(location.nationality)}</span>
                   )}
                 </h2>
-                {location.nationality && (
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(200,168,78,0.15)", color: "var(--color-gold)" }}>
-                      {location.nationality}
-                    </span>
-                  </div>
-                )}
               </div>
 
               {/* Social & Action buttons - dynamic grid based on what's available */}
@@ -305,7 +304,12 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                 const totalButtons = socialCount + baseButtons + adminButton;
                 const cols = Math.min(totalButtons, 5);
                 return (
-                  <div className={`px-6 pb-5 grid gap-3`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+                  <>
+                    {/* Separator line when more than 5 buttons */}
+                    {totalButtons > 5 && (
+                      <div className="h-[1px] mx-6 mb-4" style={{ background: "#2a2a2e" }} />
+                    )}
+                    <div className={`px-6 pb-5 grid gap-3`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
                     {/* Discord - single click = username, double click = ID */}
                     {location.discord && (
                       <div className="relative">
@@ -488,6 +492,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                       </motion.button>
                     )}
                   </div>
+                  </>
                 );
               })()}
 
@@ -549,6 +554,30 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                     <p className="text-[14px] leading-[1.7]" style={{ color: "#c7c7cc" }}>
                       {location.workedFor}
                     </p>
+                  </div>
+                </>
+              )}
+
+              {/* Relations / Connections */}
+              {location.relations && location.relations.length > 0 && (
+                <>
+                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+                  <div className="px-6 py-5">
+                    <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RELATIONS</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {location.relations.map((rel, idx) => (
+                        <motion.button
+                          key={idx}
+                          className="px-4 py-2 rounded-xl text-sm font-medium cursor-pointer"
+                          style={{ background: "rgba(6, 182, 212, 0.15)", color: "#06b6d4" }}
+                          whileHover={{ scale: 1.05, background: "rgba(6, 182, 212, 0.25)" }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => onShowStatus?.(`Search for "${rel}" in the search bar`)}
+                        >
+                          {rel}
+                        </motion.button>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}

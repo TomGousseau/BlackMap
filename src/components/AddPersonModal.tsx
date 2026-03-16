@@ -817,6 +817,56 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     />
                   </div>
 
+                  {/* Relations / Connections */}
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Relations <span className="text-[10px] font-normal">(connected people)</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        value={newRelation}
+                        onChange={(e) => setNewRelation(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addRelation())}
+                        placeholder="Add a person's name..."
+                        className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                        }}
+                      />
+                      <motion.button
+                        type="button"
+                        onClick={addRelation}
+                        className="px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer"
+                        style={{ background: "#06b6d4", color: "#000" }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Add
+                      </motion.button>
+                    </div>
+                    {/* Show added relations as tags */}
+                    {relations.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {relations.map((rel, idx) => (
+                          <motion.span
+                            key={idx}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer"
+                            style={{ background: "rgba(6, 182, 212, 0.15)", color: "#06b6d4" }}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            whileHover={{ background: "rgba(255, 59, 48, 0.2)", color: "#ff3b30" }}
+                            onClick={() => setRelations(relations.filter((_, i) => i !== idx))}
+                          >
+                            {rel}
+                            <X size={12} />
+                          </motion.span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Save button */}
                   <motion.button
                     onClick={handleSave}
