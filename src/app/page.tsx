@@ -98,6 +98,13 @@ export default function HomePage() {
     setSelectedPerson(null);
   }, []);
 
+  const handleSelectPerson = useCallback((p: PersonData) => {
+    setCenter([p.lat, p.lng]);
+    setZoom(14);
+    setSelectedPerson(p);
+    setSelectedLocation(null);
+  }, []);
+
   const handleSearch = useCallback((query: string) => {
     const found = locations.find(
       (l) => l.name.toLowerCase().includes(query.toLowerCase())
@@ -303,7 +310,7 @@ export default function HomePage() {
           locations={locations}
           persons={persons}
           onLocationClick={handleSelectLocation}
-          onPersonClick={(p: PersonData) => { setSelectedPerson(p); setSelectedLocation(null); }}
+          onPersonClick={handleSelectPerson}
           onMapClick={handleMapClick}
           addingLocation={addingLocation}
           addingPerson={addingPerson}
@@ -317,7 +324,7 @@ export default function HomePage() {
         persons={persons}
         popularSearches={[]}
         onSelect={handleSelectLocation}
-        onSelectPerson={(p: PersonData) => { setSelectedPerson(p); setSelectedLocation(null); setCenter([p.lat, p.lng]); setZoom(14); }}
+        onSelectPerson={handleSelectPerson}
         onSearch={handleSearch}
       />
 
@@ -370,12 +377,7 @@ export default function HomePage() {
         onAddBusiness={() => setShowAddBusiness(true)}
         onAddPerson={() => setShowAddPerson(true)}
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}
-        onSelectPerson={(p) => {
-          setSelectedPerson(p);
-          setSelectedLocation(null);
-          setCenter([p.lat, p.lng]);
-          setZoom(14);
-        }}
+        onSelectPerson={handleSelectPerson}
         onOpenAdmin={() => {
           if (isAdmin) {
             setShowAdminPanel(true);
