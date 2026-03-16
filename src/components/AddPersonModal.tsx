@@ -34,6 +34,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [discordId, setDiscordId] = useState("");
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
+  const [telegramId, setTelegramId] = useState("");
 
   // Location input mode
   const [locationMode, setLocationMode] = useState<"address" | "coords">("address");
@@ -115,12 +116,13 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
       discordId: discordId.trim() || undefined,
       phone: phone.trim() || undefined,
       telegram: telegram.trim() || undefined,
+      telegramId: telegramId.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
     // Reset
     setName(""); setImageUrls([""]); setAbout("");
     setReason(""); setNotableAction(""); setWorkedFor("");
-    setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram("");
+    setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -487,6 +489,22 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           value={telegram}
                           onChange={(e) => setTelegram(e.target.value)}
                           placeholder="Telegram @ username"
+                          className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
+                      {/* Telegram ID */}
+                      <div className="relative">
+                        <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#0088cc" }} />
+                        <input
+                          value={telegramId}
+                          onChange={(e) => setTelegramId(e.target.value)}
+                          placeholder="Telegram ID (numbers)"
                           className="w-full py-2.5 pl-11 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",

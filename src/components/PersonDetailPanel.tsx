@@ -352,7 +352,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                         <span className="text-[11px] font-medium action-text">Phone</span>
                       </motion.button>
                     )}
-                    {/* Telegram - single click = copy @, double click also copy @ */}
+                    {/* Telegram - single click = copy @, double click = ID */}
                     {location.telegram && (
                       <div className="relative">
                         <motion.button 
@@ -361,6 +361,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                           whileHover={{ scale: 1.05, background: "#0088cc" }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => navigator.clipboard.writeText(location.telegram!).then(() => onShowStatus?.("Telegram @ copied!"))}
+                          onDoubleClick={() => location.telegramId && navigator.clipboard.writeText(location.telegramId).then(() => onShowStatus?.("Telegram ID copied!"))}
                           onMouseEnter={() => showTooltips && handleTooltipHover(setTelegramTooltip, true)}
                           onMouseLeave={() => setTelegramTooltip(false)}
                         >
@@ -377,7 +378,7 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0 }}
                             >
-                              <span style={{ color: "#ccc" }}>Click to copy @</span>
+                              <span style={{ color: "#ccc" }}>1x @{location.telegramId ? " • 2x ID" : ""}</span>
                             </motion.div>
                           )}
                         </AnimatePresence>

@@ -64,6 +64,7 @@ export interface PersonData {
   discordId?: string; // Discord user ID
   phone?: string; // Phone number
   telegram?: string; // Telegram @ username
+  telegramId?: string; // Telegram user ID
   createdAt?: string;
   approved?: boolean;
   important?: boolean;
