@@ -557,7 +557,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                   <motion.button
                     onClick={handleSave}
                     disabled={!name.trim() || !finalCoords}
-                    className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white cursor-pointer disabled:opacity-40 mt-2"
+                    className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white cursor-pointer disabled:opacity-40 mt-2 mb-1"
                     style={{
                       background: "linear-gradient(135deg, #0891b2, #06b6d4)",
                       boxShadow: "0 4px 15px rgba(6, 182, 212, 0.3)",
