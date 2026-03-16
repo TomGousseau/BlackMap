@@ -216,11 +216,47 @@ export default function HomePage() {
       body: JSON.stringify(person),
     }).then(r => r.json()).then((saved) => {
       setPersons((prev) => [...prev, saved]);
-      showStatus(`"${person.name}" added!`);
-      setCenter([person.lat, person.lng]);
-      setZoom(14);
+      showStatus(isAdmin ? `"${person.name}" added!` : `"${person.name}" submitted for approval!`);
+      if (isAdmin) {
+        setCenter([person.lat, person.lng]);
+        setZoom(14);
+      }
     }).catch(() => showStatus("Failed to save person"));
+  }, [showStatus, isAdmin]);
+
+  const handleApprovePerson = useCallback((personId: string) => {
+    fetch(`/api/persons/${personId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved: true }),
+    }).then(() => {
+      setPersons((prev) =>
+        prev.map((p) => (p.id === personId ? { ...p, approved: true } : p))
+      );
+      showStatus("Person approved!");
+    }).catch(() => showStatus("Failed to approve"));
   }, [showStatus]);
+
+  const handleRejectPerson = useCallback((personId: string) => {
+    fetch(`/api/persons/${personId}`, { method: "DELETE" }).then(() => {
+      setPersons((prev) => prev.filter((p) => p.id !== personId));
+      showStatus("Person rejected");
+    }).catch(() => showStatus("Failed to reject"));
+  }, [showStatus]);
+
+  const handleTogglePersonImportant = useCallback((personId: string) => {
+    const person = persons.find(p => p.id === personId);
+    if (!person) return;
+    fetch(`/api/persons/${personId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ important: !person.important }),
+    }).then(() => {
+      setPersons((prev) =>
+        prev.map((p) => (p.id === personId ? { ...p, important: !p.important } : p))
+      );
+    }).catch(() => {});
+  }, [persons]);
 
   const handleAddBusinessReview = useCallback((bizId: string, review: BusinessReview) => {
     fetch(`/api/businesses/${bizId}/reviews`, {
@@ -308,7 +344,7 @@ export default function HomePage() {
           center={center}
           zoom={zoom}
           locations={locations}
-          persons={persons}
+          persons={isAdmin ? persons : persons.filter(p => p.approved)}
           onLocationClick={handleSelectLocation}
           onPersonClick={handleSelectPerson}
           onMapClick={handleMapClick}
@@ -321,7 +357,7 @@ export default function HomePage() {
       {/* Search bar */}
       <SearchBar
         locations={locations}
-        persons={persons}
+        persons={isAdmin ? persons : persons.filter(p => p.approved)}
         popularSearches={[]}
         onSelect={handleSelectLocation}
         onSelectPerson={handleSelectPerson}
@@ -373,7 +409,7 @@ export default function HomePage() {
       {/* Business profile button (top-right) */}
       <BusinessProfileButton
         businesses={businesses}
-        persons={persons}
+        persons={isAdmin ? persons : persons.filter(p => p.approved)}
         onAddBusiness={() => setShowAddBusiness(true)}
         onAddPerson={() => setShowAddPerson(true)}
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}
@@ -407,9 +443,13 @@ export default function HomePage() {
         isOpen={showAdminPanel}
         onClose={() => setShowAdminPanel(false)}
         businesses={businesses}
+        persons={persons}
         onApprove={handleApproveBusiness}
         onReject={handleRejectBusiness}
         onToggleImportant={handleToggleImportant}
+        onApprovePerson={handleApprovePerson}
+        onRejectPerson={handleRejectPerson}
+        onTogglePersonImportant={handleTogglePersonImportant}
       />
 
       {/* Place detail */}
