@@ -22,6 +22,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const allowedFields: Record<string, unknown> = {};
   if (typeof body.approved === "boolean") allowedFields.approved = body.approved;
   if (typeof body.important === "boolean") allowedFields.important = body.important;
+  if (typeof body.verified === "boolean") allowedFields.verified = body.verified;
+  if (typeof body.rating === "number") allowedFields.rating = body.rating;
 
   await db.collection("persons").updateOne(
     buildIdQuery(id),

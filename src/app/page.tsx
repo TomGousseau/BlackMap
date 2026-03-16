@@ -442,6 +442,37 @@ export default function HomePage() {
       <PersonDetailPanel
         person={selectedPerson}
         onClose={() => setSelectedPerson(null)}
+        onSetRating={(personId, rating) => {
+          fetch(`/api/persons/${personId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rating }),
+          })
+            .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(() => {
+              setPersons((prev) => prev.map((p) => p.id === personId ? { ...p, rating } : p));
+              setSelectedPerson((prev) => prev && prev.id === personId ? { ...prev, rating } : prev);
+              showStatus("Rating updated!");
+            })
+            .catch(() => showStatus("Failed to update rating"));
+        }}
+        onToggleVerified={(personId) => {
+          const person = persons.find((p) => p.id === personId);
+          if (!person) return;
+          const newVerified = !person.verified;
+          fetch(`/api/persons/${personId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ verified: newVerified }),
+          })
+            .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(() => {
+              setPersons((prev) => prev.map((p) => p.id === personId ? { ...p, verified: newVerified } : p));
+              setSelectedPerson((prev) => prev && prev.id === personId ? { ...prev, verified: newVerified } : prev);
+              showStatus(newVerified ? "Person verified!" : "Person unverified");
+            })
+            .catch(() => showStatus("Failed to update verified status"));
+        }}
         onSave={(personId) => {
           setSavedLocationIds((prev) => {
             const newSet = new Set(prev);

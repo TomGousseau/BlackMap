@@ -67,6 +67,7 @@ export interface PersonData {
   createdAt?: string;
   approved?: boolean;
   important?: boolean;
-  rating?: number;
+  verified?: boolean; // Admin-verified person
+  rating?: number; // Admin quality rating (1-5)
   reviews?: ReviewData[];
 }

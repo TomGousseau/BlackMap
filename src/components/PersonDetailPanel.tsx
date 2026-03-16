@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 
 interface PersonDetailPanelProps {
   person: PersonData | null;
   onClose: () => void;
   onAddReview?: (personId: string, review: ReviewData) => void;
+  onSetRating?: (personId: string, rating: number) => void;
+  onToggleVerified?: (personId: string) => void;
   onSave?: (personId: string) => void;
   onShare?: (personId: string) => void;
   onDelete?: (personId: string) => void;
@@ -18,10 +20,8 @@ interface PersonDetailPanelProps {
   currentUserId?: string;
 }
 
-export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShare, onDelete, onShowStatus, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
+export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, onToggleVerified, onSave, onShare, onDelete, onShowStatus, isSaved, currentUserId, isAdmin }: PersonDetailPanelProps) {
   const location = person;
-  const [reviewAuthor, setReviewAuthor] = useState("");
-  const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -97,19 +97,11 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [location, onClose]);
 
-  const canSubmit = reviewAuthor.trim() && reviewText.trim() && reviewRating > 0;
+  const canSubmit = isAdmin && reviewRating > 0;
 
   const handleSubmit = () => {
-    if (!canSubmit || !location || !onAddReview) return;
-    onAddReview(location.id, {
-      id: `r-${Date.now()}`,
-      author: reviewAuthor.trim(),
-      rating: reviewRating,
-      text: reviewText.trim(),
-      date: new Date().toISOString().split("T")[0],
-    });
-    setReviewAuthor("");
-    setReviewText("");
+    if (!canSubmit || !location || !onSetRating) return;
+    onSetRating(location.id, reviewRating);
     setReviewRating(0);
   };
 
@@ -489,11 +481,36 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
-              {/* Ratings & Reviews */}
+              {/* Quality & Verification Status */}
               <div className="px-6 py-5">
-                <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>RATINGS & REVIEWS</h3>
+                <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>STATUS</h3>
 
-                {location.rating != null && (location.reviews?.length || 0) > 0 ? (
+                {/* Verified badge */}
+                <div className="flex items-center gap-3 mb-5">
+                  {location.verified ? (
+                    <button 
+                      onClick={() => isAdmin && onToggleVerified?.(location.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl ${isAdmin ? 'cursor-pointer' : ''}`}
+                      style={{ background: "rgba(52, 199, 89, 0.15)" }}
+                    >
+                      <BadgeCheck size={18} style={{ color: "#34C759" }} />
+                      <span className="text-sm font-semibold" style={{ color: "#34C759" }}>Verified</span>
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => isAdmin && onToggleVerified?.(location.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl ${isAdmin ? 'cursor-pointer' : ''}`}
+                      style={{ background: "rgba(255, 149, 0, 0.15)" }}
+                    >
+                      <ShieldAlert size={18} style={{ color: "#FF9500" }} />
+                      <span className="text-sm font-semibold" style={{ color: "#FF9500" }}>Unverified</span>
+                    </button>
+                  )}
+                  {isAdmin && <span className="text-[10px]" style={{ color: "#636366" }}>Click to toggle</span>}
+                </div>
+
+                {/* Quality rating display */}
+                {location.rating != null && location.rating > 0 ? (
                   <div className="flex items-center gap-4 mb-5">
                     <span className="text-[44px] font-bold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>{location.rating}</span>
                     <div>
@@ -505,105 +522,60 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                           />
                         ))}
                       </div>
-                      <span className="text-[13px]" style={{ color: "#8e8e93" }}>
-                        {(location.reviews?.length || 0)} reviews
-                      </span>
+                      <span className="text-[13px]" style={{ color: "#8e8e93" }}>Quality Rating</span>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-[13px]" style={{ color: "#8e8e93" }}>Unreviewed</span>
-                )}
-
-                {/* Existing reviews */}
-                {location.reviews && location.reviews.length > 0 && (
-                  <div className="space-y-3 mb-5">
-                    {location.reviews.map((r) => (
-                      <div key={r.id} className="p-4 rounded-2xl" style={{ background: "#1e1e21" }}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[14px] font-semibold" style={{ color: "#fff" }}>{r.author}</span>
-                          <div className="flex items-center gap-0.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} size={12}
-                                fill={i < r.rating ? "#d4af37" : "transparent"}
-                                style={{ color: i < r.rating ? "#d4af37" : "#48484a" }}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-[13px] leading-[1.5]" style={{ color: "#a1a1a6" }}>{r.text}</p>
-                        <span className="text-[12px] mt-2 block" style={{ color: "#636366" }}>{r.date}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <span className="text-[13px]" style={{ color: "#8e8e93" }}>Not yet rated</span>
                 )}
               </div>
 
-              {/* Write Review */}
-              {onAddReview && (
+              {/* Admin Rate Quality */}
+              {isAdmin && onSetRating && (
                 <>
                   <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
                   <div className="px-6 py-5">
-                    <h3 className="text-[12px] font-semibold tracking-wider mb-5" style={{ color: "#8e8e93" }}>WRITE A REVIEW</h3>
+                    <h3 className="text-[12px] font-semibold tracking-wider mb-5" style={{ color: "#8e8e93" }}>RATE QUALITY (ADMIN)</h3>
                     
                     {/* Star picker */}
-                    <div className="flex items-center gap-2 mb-5">
-                      {[1, 2, 3, 4, 5].map((s) => {
-                        const isActive = s <= (hoverRating || reviewRating);
-                        return (
-                          <button 
-                            key={s} 
-                            className="cursor-pointer"
-                            onMouseEnter={() => setHoverRating(s)}
-                            onMouseLeave={() => setHoverRating(0)}
-                            onClick={() => setReviewRating(s)}
-                            style={{ 
-                              transform: "scale(1)",
-                              transition: "transform 0.15s ease",
-                            }}
-                            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.9)")}
-                            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                          >
-                            <Star 
-                              size={24}
-                              fill={isActive ? "#d4af37" : "transparent"}
-                              color={isActive ? "#d4af37" : "#48484a"}
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Name input */}
-                    <input
-                      type="text"
-                      value={reviewAuthor}
-                      onChange={(e) => setReviewAuthor(e.target.value)}
-                      placeholder="Your name"
-                      className="w-full py-3.5 px-4 rounded-xl text-[14px] outline-none mb-3"
-                      style={{ background: "#1e1e21", color: "#fff", border: "none" }}
-                    />
-
-                    {/* Review input + send */}
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                        placeholder="Write your review..."
-                        className="flex-1 py-3.5 px-4 rounded-xl text-[14px] outline-none"
-                        style={{ background: "#1e1e21", color: "#fff", border: "none" }}
-                        onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-                      />
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((s) => {
+                          const isActive = s <= (hoverRating || reviewRating);
+                          return (
+                            <button 
+                              key={s} 
+                              className="cursor-pointer"
+                              onMouseEnter={() => setHoverRating(s)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onClick={() => setReviewRating(s)}
+                              style={{ 
+                                transform: "scale(1)",
+                                transition: "transform 0.15s ease",
+                              }}
+                              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.9)")}
+                              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                            >
+                              <Star 
+                                size={28}
+                                fill={isActive ? "#d4af37" : "transparent"}
+                                color={isActive ? "#d4af37" : "#48484a"}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
                       <button
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer"
+                        className="ml-auto px-5 py-2.5 rounded-xl flex items-center justify-center cursor-pointer text-sm font-semibold"
                         style={{ 
                           background: canSubmit ? "#d4af37" : "#2a2a2e", 
+                          color: canSubmit ? "#000" : "#636366",
                           opacity: canSubmit ? 1 : 0.5,
                         }}
                       >
-                        <Send size={18} style={{ color: canSubmit ? "#000" : "#636366" }} />
+                        Set Rating
                       </button>
                     </div>
                   </div>
