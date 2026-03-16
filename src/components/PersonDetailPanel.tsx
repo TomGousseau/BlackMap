@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 
 interface PersonDetailPanelProps {
@@ -282,12 +282,19 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                 <h2 className="text-[22px] font-semibold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
                   {location.name}
                 </h2>
+                {location.nationality && (
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(200,168,78,0.15)", color: "var(--color-gold)" }}>
+                      {location.nationality}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Social & Action buttons - dynamic grid based on what's available */}
               {(() => {
-                const hasSocial = location.discord || location.youtube || location.phone || location.telegram;
-                const socialCount = [location.discord, location.youtube, location.phone, location.telegram].filter(Boolean).length;
+                const hasSocial = location.discord || location.youtube || location.phone || location.telegram || location.vk || location.github || location.steam || location.website;
+                const socialCount = [location.discord, location.youtube, location.phone, location.telegram, location.vk, location.github, location.steam, location.website].filter(Boolean).length;
                 const baseButtons = 2; // Share + Save
                 const adminButton = isAdmin && onDelete ? 1 : 0;
                 const totalButtons = socialCount + baseButtons + adminButton;
@@ -383,6 +390,58 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                           )}
                         </AnimatePresence>
                       </div>
+                    )}
+                    {/* VK */}
+                    {location.vk && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#4C75A3" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(location.vk!.startsWith('http') ? location.vk : `https://${location.vk}`, '_blank')}
+                      >
+                        <span className="text-xs font-bold action-icon">VK</span>
+                        <span className="text-[11px] font-medium action-text">VK</span>
+                      </motion.button>
+                    )}
+                    {/* GitHub */}
+                    {location.github && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#333" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(`https://github.com/${location.github}`, '_blank')}
+                      >
+                        <Github size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">GitHub</span>
+                      </motion.button>
+                    )}
+                    {/* Steam */}
+                    {location.steam && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#1b2838" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(location.steam!.startsWith('http') ? location.steam : `https://${location.steam}`, '_blank')}
+                      >
+                        <Gamepad2 size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">Steam</span>
+                      </motion.button>
+                    )}
+                    {/* Website */}
+                    {location.website && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#3b82f6" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(location.website!.startsWith('http') ? location.website : `https://${location.website}`, '_blank')}
+                      >
+                        <Globe size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">Website</span>
+                      </motion.button>
                     )}
                     {/* Share */}
                     <motion.button 

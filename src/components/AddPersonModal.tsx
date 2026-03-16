@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 
@@ -35,6 +35,11 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
   const [telegramId, setTelegramId] = useState("");
+  const [vk, setVk] = useState("");
+  const [github, setGithub] = useState("");
+  const [steam, setSteam] = useState("");
+  const [website, setWebsite] = useState("");
+  const [nationality, setNationality] = useState("");
 
   // Location input mode
   const [locationMode, setLocationMode] = useState<"address" | "coords">("address");
@@ -117,12 +122,18 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
       phone: phone.trim() || undefined,
       telegram: telegram.trim() || undefined,
       telegramId: telegramId.trim() || undefined,
+      vk: vk.trim() || undefined,
+      github: github.trim() || undefined,
+      steam: steam.trim() || undefined,
+      website: website.trim() || undefined,
+      nationality: nationality.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
     // Reset
     setName(""); setImageUrls([""]); setAbout("");
     setReason(""); setNotableAction(""); setWorkedFor("");
     setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
+    setVk(""); setGithub(""); setSteam(""); setWebsite(""); setNationality("");
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -525,6 +536,97 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           }}
                         />
                       </div>
+                      {/* VK */}
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold"
+                          style={{ color: "#4C75A3" }}>VK</span>
+                        <input
+                          value={vk}
+                          onChange={(e) => setVk(e.target.value)}
+                          placeholder="VK profile URL"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
+                          }}
+                        />
+                      </div>
+                      {/* GitHub */}
+                      <div className="relative">
+                        <Github size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#fff" }} />
+                        <input
+                          value={github}
+                          onChange={(e) => setGithub(e.target.value)}
+                          placeholder="GitHub username"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
+                          }}
+                        />
+                      </div>
+                      {/* Steam */}
+                      <div className="relative">
+                        <Gamepad2 size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#1b2838" }} />
+                        <input
+                          value={steam}
+                          onChange={(e) => setSteam(e.target.value)}
+                          placeholder="Steam profile URL"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
+                          }}
+                        />
+                      </div>
+                      {/* Website */}
+                      <div className="relative">
+                        <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#3b82f6" }} />
+                        <input
+                          value={website}
+                          onChange={(e) => setWebsite(e.target.value)}
+                          placeholder="Website URL"
+                          className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                            paddingLeft: "44px",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nationality */}
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Nationality <span className="text-[10px] font-normal">(optional)</span>
+                    </label>
+                    <div className="relative">
+                      <Flag size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                        style={{ color: "var(--color-gold)" }} />
+                      <input
+                        value={nationality}
+                        onChange={(e) => setNationality(e.target.value)}
+                        placeholder="e.g. American, British, etc."
+                        className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "44px",
+                        }}
+                      />
                     </div>
                   </div>
 

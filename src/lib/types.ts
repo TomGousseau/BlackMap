@@ -65,6 +65,11 @@ export interface PersonData {
   phone?: string; // Phone number
   telegram?: string; // Telegram @ username
   telegramId?: string; // Telegram user ID
+  vk?: string; // VK profile URL
+  github?: string; // GitHub username
+  steam?: string; // Steam profile URL
+  website?: string; // Personal website
+  nationality?: string; // Nationality
   createdAt?: string;
   approved?: boolean;
   important?: boolean;
