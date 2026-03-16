@@ -154,8 +154,8 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
                     Logo / Image URL <span className="text-[10px] font-normal">(optional)</span>
                   </label>
                   <div className="relative">
-                    <ImageIcon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2"
-                      style={{ color: "#06b6d4" }} />
+                    <ImageIcon size={16} className="absolute top-1/2 -translate-y-1/2"
+                      style={{ color: "#06b6d4", left: "16px" }} />
                     <input
                       type="url"
                       value={imageUrl}
@@ -166,7 +166,7 @@ export function AddBusinessModal({ isOpen, onClose, onSave }: AddBusinessModalPr
                         background: "var(--color-surface)",
                         color: "var(--color-text)",
                         border: "1px solid var(--color-border)",
-                        paddingLeft: "48px",
+                        paddingLeft: "52px",
                       }}
                     />
                   </div>
