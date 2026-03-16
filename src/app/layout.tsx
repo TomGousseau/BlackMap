@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Blackrock V2 — Explore the World",
-  description: "A premium Apple-style maps experience",
+  title: "Blackrock V2",
+  description: "The best map   GMAPS X APPLEMAP",
 };
 
 export default function RootLayout({
