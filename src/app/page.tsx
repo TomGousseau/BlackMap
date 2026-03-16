@@ -494,6 +494,14 @@ export default function HomePage() {
         onReject={handleRejectBusiness}
         onApprovePerson={handleApprovePerson}
         onRejectPerson={handleRejectPerson}
+        onPreviewBusiness={(biz) => {
+          setSelectedBusiness(biz);
+          setShowAdminPanel(false);
+        }}
+        onPreviewPerson={(p) => {
+          setSelectedPerson(p);
+          setShowAdminPanel(false);
+        }}
       />
 
       {/* Settings panel */}

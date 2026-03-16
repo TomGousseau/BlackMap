@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Shield, Check, X as XIcon, Building2, User, Zap } from "lucide-react";
+import { X, Shield, Check, X as XIcon, Building2, User, Zap, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { BusinessProfile, PersonData } from "@/lib/types";
 
@@ -14,6 +14,8 @@ interface AdminPanelProps {
   onReject: (bizId: string) => void;
   onApprovePerson: (personId: string) => void;
   onRejectPerson: (personId: string) => void;
+  onPreviewBusiness?: (biz: BusinessProfile) => void;
+  onPreviewPerson?: (person: PersonData) => void;
 }
 
 export function AdminPanel({
@@ -25,6 +27,8 @@ export function AdminPanel({
   onReject,
   onApprovePerson,
   onRejectPerson,
+  onPreviewBusiness,
+  onPreviewPerson,
 }: AdminPanelProps) {
   const [autoRefuseEnabled, setAutoRefuseEnabled] = useState(false);
   const pendingBusinesses = businesses.filter((b) => !b.approved);
@@ -193,6 +197,16 @@ export function AdminPanel({
                         {/* Actions */}
                         <div className="flex items-center gap-2">
                           <motion.button
+                            onClick={() => onPreviewBusiness?.(biz)}
+                            className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer"
+                            style={{ background: "rgba(142, 142, 147, 0.15)" }}
+                            whileHover={{ scale: 1.1, background: "#8e8e93" }}
+                            whileTap={{ scale: 0.9 }}
+                            title="Preview"
+                          >
+                            <Eye size={16} style={{ color: "#8e8e93" }} />
+                          </motion.button>
+                          <motion.button
                             onClick={() => onReject(biz.id)}
                             className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer"
                             style={{ background: "rgba(255, 59, 48, 0.15)" }}
@@ -275,6 +289,16 @@ export function AdminPanel({
 
                         {/* Actions */}
                         <div className="flex items-center gap-2">
+                          <motion.button
+                            onClick={() => onPreviewPerson?.(p)}
+                            className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer"
+                            style={{ background: "rgba(142, 142, 147, 0.15)" }}
+                            whileHover={{ scale: 1.1, background: "#8e8e93" }}
+                            whileTap={{ scale: 0.9 }}
+                            title="Preview"
+                          >
+                            <Eye size={16} style={{ color: "#8e8e93" }} />
+                          </motion.button>
                           <motion.button
                             onClick={() => onRejectPerson(p.id)}
                             className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer"
