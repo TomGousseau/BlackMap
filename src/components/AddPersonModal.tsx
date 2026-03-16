@@ -353,10 +353,10 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     </label>
                     <div className="space-y-2">
                       {imageUrls.map((url, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <div className="relative flex-1">
-                            <ImagePlus size={16} className="absolute top-1/2 -translate-y-1/2"
-                              style={{ color: "#06b6d4", left: "16px" }} />
+                        <div key={idx} className="flex gap-2 items-center">
+                          <div className="relative flex-1 min-w-0">
+                            <ImagePlus size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                              style={{ color: "#06b6d4", left: "16px", zIndex: 1 }} />
                             <input
                               value={url}
                               onChange={(e) => {
@@ -378,7 +378,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             <motion.button
                               type="button"
                               onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== idx))}
-                              className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer"
+                              className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
                               style={{ background: "var(--color-surface)" }}
                               whileHover={{ scale: 1.05, background: "#ff3b30" }}
                               whileTap={{ scale: 0.95 }}
