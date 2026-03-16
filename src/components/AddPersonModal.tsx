@@ -149,7 +149,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
               {/* Cyan top bar for person */}
               <div className="h-1.5 shrink-0" style={{ background: "linear-gradient(90deg, #06b6d4, #22d3ee, #67e8f9)" }} />
               
-              <div className="p-6 overflow-y-auto" data-lenis-prevent>
+              <div className="p-6 pb-8 overflow-y-auto" data-lenis-prevent>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
