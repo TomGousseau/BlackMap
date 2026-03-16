@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2 } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 
@@ -23,12 +23,16 @@ interface AddPersonModalProps {
 
 export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPersonModalProps) {
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([""]);
   const [about, setAbout] = useState("");
   const [reason, setReason] = useState("");
   const [notableAction, setNotableAction] = useState("");
   const [workedFor, setWorkedFor] = useState("");
+  // Social links
+  const [discord, setDiscord] = useState("");
+  const [youtube, setYoutube] = useState("");
+  const [discordId, setDiscordId] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Location input mode
   const [locationMode, setLocationMode] = useState<"address" | "coords">("address");
@@ -56,23 +60,15 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     setGeocoding(true);
     setGeocodeError("");
     try {
-      // Use structured params for better results, increase limit
-      const params = new URLSearchParams({
-        format: "json",
-        q: query,
-        limit: "8",
-        addressdetails: "1",
-        dedupe: "1",
-      });
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?${params}`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
         { headers: { "User-Agent": "BlackrockMaps/1.0" } }
       );
       const data: NominatimResult[] = await res.json();
       setSuggestions(data || []);
       setShowSuggestions(data.length > 0);
       if (data.length === 0 && query.trim().length > 5) {
-        setGeocodeError("No results found - try a simpler address");
+        setGeocodeError("No results found");
       }
     } catch {
       setGeocodeError("Search failed");
@@ -101,22 +97,28 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
 
   const handleSave = () => {
     if (!name.trim() || !finalCoords) return;
+    const validImages = imageUrls.filter(url => url.trim());
     onSave({
       id: `person-${Date.now()}`,
       name: name.trim(),
       lat: finalCoords.lat,
       lng: finalCoords.lng,
-      address: address.trim() || undefined,
-      imageUrl: imageUrl.trim() || undefined,
+      imageUrl: validImages[0] || undefined,
+      imageUrls: validImages.length > 1 ? validImages : undefined,
       about: about.trim() || undefined,
       reason: reason.trim() || undefined,
       notableAction: notableAction.trim() || undefined,
       workedFor: workedFor.trim() || undefined,
+      discord: discord.trim() || undefined,
+      youtube: youtube.trim() || undefined,
+      discordId: discordId.trim() || undefined,
+      phone: phone.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
     // Reset
-    setName(""); setAddress(""); setImageUrl(""); setAbout("");
+    setName(""); setImageUrls([""]); setAbout("");
     setReason(""); setNotableAction(""); setWorkedFor("");
+    setDiscord(""); setYoutube(""); setDiscordId(""); setPhone("");
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -335,53 +337,147 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     />
                   </div>
 
-                  {/* Address - Optional */}
+                  {/* Multiple Image URLs */}
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
-                      Address <span className="text-[10px] font-normal">(optional)</span>
+                      Pictures <span className="text-[10px] font-normal">(optional, needs approval)</span>
                     </label>
-                    <input
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Display address"
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="space-y-2">
+                      {imageUrls.map((url, idx) => (
+                        <div key={idx} className="flex gap-2">
+                          <div className="relative flex-1">
+                            <ImagePlus size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                              style={{ color: "var(--color-text-secondary)" }} />
+                            <input
+                              value={url}
+                              onChange={(e) => {
+                                const newUrls = [...imageUrls];
+                                newUrls[idx] = e.target.value;
+                                setImageUrls(newUrls);
+                              }}
+                              placeholder="https://example.com/photo.jpg"
+                              className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                              style={{
+                                background: "var(--color-surface)",
+                                color: "var(--color-text)",
+                                border: "1px solid var(--color-border)",
+                              }}
+                            />
+                          </div>
+                          {imageUrls.length > 1 && (
+                            <motion.button
+                              type="button"
+                              onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== idx))}
+                              className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer"
+                              style={{ background: "var(--color-surface)" }}
+                              whileHover={{ scale: 1.05, background: "#ff3b30" }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Trash2 size={14} style={{ color: "var(--color-text-secondary)" }} />
+                            </motion.button>
+                          )}
+                        </div>
+                      ))}
+                      <motion.button
+                        type="button"
+                        onClick={() => setImageUrls([...imageUrls, ""])}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer"
+                        style={{ background: "var(--color-surface)", color: "#06b6d4" }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Plus size={12} />
+                        Add another picture
+                      </motion.button>
+                    </div>
+                    {/* Preview thumbnails */}
+                    {imageUrls.filter(u => u.trim()).length > 0 && (
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        {imageUrls.filter(u => u.trim()).map((url, idx) => (
+                          <motion.div
+                            key={idx}
+                            className="h-16 w-16 rounded-lg overflow-hidden"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                          >
+                            <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Image URL */}
+                  {/* Social Links Section */}
                   <div>
-                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
-                      Picture <span className="text-[10px] font-normal">(optional)</span>
+                    <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Social Links <span className="text-[10px] font-normal">(optional)</span>
                     </label>
-                    <div className="relative">
-                      <ImagePlus size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                        style={{ color: "var(--color-text-secondary)" }} />
-                      <input
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        placeholder="https://example.com/photo.jpg"
-                        className="w-full py-3 pl-10 pr-4 rounded-2xl text-sm outline-none"
-                        style={{
-                          background: "var(--color-surface)",
-                          color: "var(--color-text)",
-                          border: "1px solid var(--color-border)",
-                        }}
-                      />
+                    <div className="space-y-2">
+                      {/* Discord Username */}
+                      <div className="relative">
+                        <MessageCircle size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#5865F2" }} />
+                        <input
+                          value={discord}
+                          onChange={(e) => setDiscord(e.target.value)}
+                          placeholder="Discord username"
+                          className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
+                      {/* Discord ID */}
+                      <div className="relative">
+                        <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#5865F2" }} />
+                        <input
+                          value={discordId}
+                          onChange={(e) => setDiscordId(e.target.value)}
+                          placeholder="Discord ID (numbers)"
+                          className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
+                      {/* YouTube */}
+                      <div className="relative">
+                        <Youtube size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#FF0000" }} />
+                        <input
+                          value={youtube}
+                          onChange={(e) => setYoutube(e.target.value)}
+                          placeholder="YouTube channel URL"
+                          className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
+                      {/* Phone */}
+                      <div className="relative">
+                        <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "#34C759" }} />
+                        <input
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="Phone number"
+                          className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none"
+                          style={{
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
+                            border: "1px solid var(--color-border)",
+                          }}
+                        />
+                      </div>
                     </div>
-                    {imageUrl && (
-                      <motion.div
-                        className="mt-2 h-24 w-24 rounded-full overflow-hidden mx-auto"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                      >
-                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                      </motion.div>
-                    )}
                   </div>
 
                   {/* About */}

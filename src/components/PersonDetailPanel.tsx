@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Navigation, Globe, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Hash, ExternalLink } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
 
 interface PersonDetailPanelProps {
@@ -28,7 +28,8 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
   // Get all images
   const allImages = location ? [
     ...(location.imageUrl ? [location.imageUrl] : []),
-  ] : [];
+    ...(location.imageUrls || []),
+  ].filter((v, i, a) => a.indexOf(v) === i) : []; // dedupe
 
   // Reset image index when location changes
   useEffect(() => {
@@ -166,68 +167,117 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSave, onShar
                 <h2 className="text-[22px] font-semibold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
                   {location.name}
                 </h2>
-                {location.address && (
-                  <p className="text-[14px] mt-1" style={{ color: "#8e8e93" }}>{location.address}</p>
-                )}
               </div>
 
-              {/* Action buttons */}
-              <div className={`px-6 pb-5 grid gap-3 ${isAdmin && onDelete ? 'grid-cols-5' : 'grid-cols-4'}`}>
-                <motion.button 
-                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#d4af37" }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Navigation size={18} className="action-icon" />
-                  <span className="text-[11px] font-semibold action-text">Directions</span>
-                </motion.button>
-                <motion.button 
-                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#d4af37" }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Globe size={18} className="action-icon" />
-                  <span className="text-[11px] font-medium action-text">Website</span>
-                </motion.button>
-                <motion.button 
-                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#d4af37" }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => location && onShare?.(location.id)}
-                >
-                  <Share size={18} className="action-icon" />
-                  <span className="text-[11px] font-medium action-text">Share</span>
-                </motion.button>
-                <motion.button 
-                  className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                  style={{ background: isSaved ? "#d4af37" : "#232326" }}
-                  whileHover={{ scale: 1.05, background: "#d4af37" }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => location && onSave?.(location.id)}
-                >
-                  {isSaved ? (
-                    <BookmarkCheck size={18} style={{ color: "#000" }} />
-                  ) : (
-                    <Bookmark size={18} className="action-icon" />
-                  )}
-                  <span className="text-[11px] font-medium" style={{ color: isSaved ? "#000" : undefined }}>{isSaved ? "Saved" : "Save"}</span>
-                </motion.button>
-                {isAdmin && onDelete && (
-                  <motion.button 
-                    className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
-                    style={{ background: "#232326" }}
-                    whileHover={{ scale: 1.05, background: "#ff3b30" }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => location && onDelete(location.id)}
-                  >
-                    <Trash2 size={18} className="action-icon" />
-                    <span className="text-[11px] font-medium action-text">Delete</span>
-                  </motion.button>
-                )}
-              </div>
+              {/* Social & Action buttons - dynamic grid based on what's available */}
+              {(() => {
+                const hasSocial = location.discord || location.youtube || location.discordId || location.phone;
+                const socialCount = [location.discord, location.youtube, location.phone].filter(Boolean).length;
+                const baseButtons = 2; // Share + Save
+                const adminButton = isAdmin && onDelete ? 1 : 0;
+                const totalButtons = socialCount + baseButtons + adminButton;
+                const cols = Math.min(totalButtons, 5);
+                return (
+                  <div className={`px-6 pb-5 grid gap-3`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+                    {/* Discord */}
+                    {location.discord && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#5865F2" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => navigator.clipboard.writeText(location.discord!).then(() => alert("Discord copied!"))}
+                      >
+                        <MessageCircle size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">Discord</span>
+                      </motion.button>
+                    )}
+                    {/* YouTube */}
+                    {location.youtube && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#FF0000" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(location.youtube, "_blank")}
+                      >
+                        <Youtube size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">YouTube</span>
+                      </motion.button>
+                    )}
+                    {/* Phone */}
+                    {location.phone && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#34C759" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(`tel:${location.phone}`, "_self")}
+                      >
+                        <Phone size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">Call</span>
+                      </motion.button>
+                    )}
+                    {/* Share */}
+                    <motion.button 
+                      className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                      style={{ background: "#232326" }}
+                      whileHover={{ scale: 1.05, background: "#d4af37" }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => location && onShare?.(location.id)}
+                    >
+                      <Share size={18} className="action-icon" />
+                      <span className="text-[11px] font-medium action-text">Share</span>
+                    </motion.button>
+                    {/* Save */}
+                    <motion.button 
+                      className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                      style={{ background: isSaved ? "#d4af37" : "#232326" }}
+                      whileHover={{ scale: 1.05, background: "#d4af37" }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => location && onSave?.(location.id)}
+                    >
+                      {isSaved ? (
+                        <BookmarkCheck size={18} style={{ color: "#000" }} />
+                      ) : (
+                        <Bookmark size={18} className="action-icon" />
+                      )}
+                      <span className="text-[11px] font-medium" style={{ color: isSaved ? "#000" : undefined }}>{isSaved ? "Saved" : "Save"}</span>
+                    </motion.button>
+                    {/* Delete (admin only) */}
+                    {isAdmin && onDelete && (
+                      <motion.button 
+                        className="flex flex-col items-center justify-center gap-1.5 pt-4 pb-3 rounded-2xl cursor-pointer" 
+                        style={{ background: "#232326" }}
+                        whileHover={{ scale: 1.05, background: "#ff3b30" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => location && onDelete(location.id)}
+                      >
+                        <Trash2 size={18} className="action-icon" />
+                        <span className="text-[11px] font-medium action-text">Delete</span>
+                      </motion.button>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Discord ID info if available */}
+              {location.discordId && (
+                <div className="px-6 pb-4">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#232326" }}>
+                    <Hash size={14} style={{ color: "#5865F2" }} />
+                    <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Discord ID:</span>
+                    <span className="text-xs font-mono" style={{ color: "#fff" }}>{location.discordId}</span>
+                    <button 
+                      onClick={() => navigator.clipboard.writeText(location.discordId!)}
+                      className="ml-auto text-xs cursor-pointer"
+                      style={{ color: "#5865F2" }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />

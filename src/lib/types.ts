@@ -52,12 +52,17 @@ export interface PersonData {
   name: string;
   lat: number;
   lng: number;
-  address?: string;
   imageUrl?: string;
+  imageUrls?: string[]; // Multiple images for gallery
   about?: string;
   reason?: string;
   notableAction?: string;
   workedFor?: string;
+  // Social links
+  discord?: string; // Discord username
+  youtube?: string; // YouTube channel URL
+  discordId?: string; // Discord user ID
+  phone?: string; // Phone number
   createdAt?: string;
   approved?: boolean;
   important?: boolean;
