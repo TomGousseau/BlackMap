@@ -436,8 +436,8 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                     <div className="space-y-2">
                       {/* Discord Username */}
                       <div className="relative">
-                        <MessageCircle size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#5865F2" }} />
+                        <MessageCircle size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#5865F2", left: "16px", zIndex: 1 }} />
                         <input
                           value={discord}
                           onChange={(e) => setDiscord(e.target.value)}
@@ -447,14 +447,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Discord ID */}
                       <div className="relative">
-                        <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#5865F2" }} />
+                        <Hash size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#5865F2", left: "16px", zIndex: 1 }} />
                         <input
                           value={discordId}
                           onChange={(e) => setDiscordId(e.target.value)}
@@ -464,14 +464,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* YouTube */}
                       <div className="relative">
-                        <Youtube size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#FF0000" }} />
+                        <Youtube size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#FF0000", left: "16px", zIndex: 1 }} />
                         <input
                           value={youtube}
                           onChange={(e) => setYoutube(e.target.value)}
@@ -481,14 +481,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Phone */}
                       <div className="relative">
-                        <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#34C759" }} />
+                        <Phone size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#34C759", left: "16px", zIndex: 1 }} />
                         <input
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
@@ -498,14 +498,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Telegram */}
                       <div className="relative">
-                        <Send size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#0088cc" }} />
+                        <Send size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#0088cc", left: "16px", zIndex: 1 }} />
                         <input
                           value={telegram}
                           onChange={(e) => setTelegram(e.target.value)}
@@ -515,14 +515,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Telegram ID */}
                       <div className="relative">
-                        <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#0088cc" }} />
+                        <Hash size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#0088cc", left: "16px", zIndex: 1 }} />
                         <input
                           value={telegramId}
                           onChange={(e) => setTelegramId(e.target.value)}
@@ -532,14 +532,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* VK */}
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold"
-                          style={{ color: "#4C75A3" }}>VK</span>
+                        <span className="absolute top-1/2 -translate-y-1/2 text-xs font-bold pointer-events-none"
+                          style={{ color: "#4C75A3", left: "16px", zIndex: 1 }}>VK</span>
                         <input
                           value={vk}
                           onChange={(e) => setVk(e.target.value)}
@@ -549,14 +549,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* GitHub */}
                       <div className="relative">
-                        <Github size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#fff" }} />
+                        <Github size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#fff", left: "16px", zIndex: 1 }} />
                         <input
                           value={github}
                           onChange={(e) => setGithub(e.target.value)}
@@ -566,14 +566,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Steam */}
                       <div className="relative">
-                        <Gamepad2 size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#1b2838" }} />
+                        <Gamepad2 size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#66c0f4", left: "16px", zIndex: 1 }} />
                         <input
                           value={steam}
                           onChange={(e) => setSteam(e.target.value)}
@@ -583,14 +583,14 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
                       {/* Website */}
                       <div className="relative">
-                        <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#3b82f6" }} />
+                        <Globe size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: "#3b82f6", left: "16px", zIndex: 1 }} />
                         <input
                           value={website}
                           onChange={(e) => setWebsite(e.target.value)}
@@ -600,7 +600,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
                             border: "1px solid var(--color-border)",
-                            paddingLeft: "44px",
+                            paddingLeft: "52px",
                           }}
                         />
                       </div>
@@ -613,8 +613,8 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                       Nationality <span className="text-[10px] font-normal">(optional)</span>
                     </label>
                     <div className="relative">
-                      <Flag size={16} className="absolute left-3 top-1/2 -translate-y-1/2"
-                        style={{ color: "var(--color-gold)" }} />
+                      <Flag size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "var(--color-gold)", left: "16px", zIndex: 1 }} />
                       <input
                         value={nationality}
                         onChange={(e) => setNationality(e.target.value)}
@@ -624,7 +624,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
                           background: "var(--color-surface)",
                           color: "var(--color-text)",
                           border: "1px solid var(--color-border)",
-                          paddingLeft: "44px",
+                          paddingLeft: "52px",
                         }}
                       />
                     </div>

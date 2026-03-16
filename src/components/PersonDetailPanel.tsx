@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Share, Bookmark, BookmarkCheck, Send, Trash2, ChevronLeft, ChevronRight, MessageCircle, Youtube, Phone, Maximize2, Download, BadgeCheck, ShieldAlert, Globe, Gamepad2, Github } from "lucide-react";
 import type { PersonData, ReviewData } from "@/lib/types";
+import { getFlagEmoji } from "@/lib/flags";
 
 interface PersonDetailPanelProps {
   person: PersonData | null;
@@ -279,8 +280,11 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                     </button>
                   </div>
                 )}
-                <h2 className="text-[22px] font-semibold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
+                <h2 className="text-[22px] font-semibold flex items-center gap-2" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
                   {location.name}
+                  {location.nationality && getFlagEmoji(location.nationality) && (
+                    <span className="text-xl">{getFlagEmoji(location.nationality)}</span>
+                  )}
                 </h2>
                 {location.nationality && (
                   <div className="flex items-center gap-1.5 mt-2">
