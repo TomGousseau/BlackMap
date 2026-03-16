@@ -53,6 +53,21 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
   const [showSocialLinks, setShowSocialLinks] = useState(false);
   const [signature, setSignature] = useState("");
 
+  // URL Validation functions
+  const isValidUrl = (url: string, domain: string): boolean => {
+    if (!url.trim()) return true; // Empty is valid (optional field)
+    const trimmed = url.trim().toLowerCase();
+    // Accept: domain.com/..., www.domain.com/..., http(s)://domain.com/..., http(s)://www.domain.com/...
+    const pattern = new RegExp(`^(https?:\\/\\/)?(www\\.)?${domain.replace('.', '\\.')}`);
+    return pattern.test(trimmed);
+  };
+  
+  const youtubeError = youtube.trim() && !isValidUrl(youtube, 'youtube.com');
+  const vkError = vk.trim() && !isValidUrl(vk, 'vk.com');
+  const githubError = github.trim() && !isValidUrl(github, 'github.com');
+  const steamError = steam.trim() && !isValidUrl(steam, 'steamcommunity.com');
+  const hasSocialErrors = youtubeError || vkError || githubError || steamError;
+
   // Pre-fill signature with default when opening (not editing)
   useEffect(() => {
     if (isOpen && !editMode && defaultSignature) {
@@ -195,7 +210,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
   };
 
   const handleSave = () => {
-    if (!name.trim() || !finalCoords) return;
+    if (!name.trim() || !finalCoords || hasSocialErrors) return;
     const validImages = imageUrls.filter(url => url.trim());
     onSave({
       id: editMode && personToEdit ? personToEdit.id : `person-${Date.now()}`,
@@ -615,15 +630,20 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         <input
                           value={youtube}
                           onChange={(e) => setYoutube(e.target.value)}
-                          placeholder="YouTube channel URL"
+                          placeholder="youtube.com/..."
                           className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
-                            border: "1px solid var(--color-border)",
+                            border: youtubeError ? "1px solid #ef4444" : "1px solid var(--color-border)",
                             paddingLeft: "52px",
                           }}
                         />
+                        {youtubeError && (
+                          <span className="text-xs mt-0.5 block" style={{ color: "#ef4444" }}>
+                            Must start with youtube.com
+                          </span>
+                        )}
                       </div>
                       {/* Phone */}
                       <div className="relative">
@@ -632,7 +652,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         <input
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          placeholder="Phone number"
+                          placeholder="Include country code (+1, +44...)"
                           className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
@@ -683,15 +703,20 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         <input
                           value={vk}
                           onChange={(e) => setVk(e.target.value)}
-                          placeholder="VK profile URL"
+                          placeholder="vk.com/..."
                           className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
-                            border: "1px solid var(--color-border)",
+                            border: vkError ? "1px solid #ef4444" : "1px solid var(--color-border)",
                             paddingLeft: "52px",
                           }}
                         />
+                        {vkError && (
+                          <span className="text-xs mt-0.5 block" style={{ color: "#ef4444" }}>
+                            Must start with vk.com
+                          </span>
+                        )}
                       </div>
                       {/* GitHub */}
                       <div className="relative">
@@ -700,15 +725,20 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         <input
                           value={github}
                           onChange={(e) => setGithub(e.target.value)}
-                          placeholder="GitHub username"
+                          placeholder="github.com/..."
                           className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
-                            border: "1px solid var(--color-border)",
+                            border: githubError ? "1px solid #ef4444" : "1px solid var(--color-border)",
                             paddingLeft: "52px",
                           }}
                         />
+                        {githubError && (
+                          <span className="text-xs mt-0.5 block" style={{ color: "#ef4444" }}>
+                            Must start with github.com
+                          </span>
+                        )}
                       </div>
                       {/* Steam */}
                       <div className="relative">
@@ -717,15 +747,20 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                         <input
                           value={steam}
                           onChange={(e) => setSteam(e.target.value)}
-                          placeholder="Steam profile URL"
+                          placeholder="steamcommunity.com/..."
                           className="w-full py-2.5 pr-4 rounded-xl text-sm outline-none"
                           style={{
                             background: "var(--color-surface)",
                             color: "var(--color-text)",
-                            border: "1px solid var(--color-border)",
+                            border: steamError ? "1px solid #ef4444" : "1px solid var(--color-border)",
                             paddingLeft: "52px",
                           }}
                         />
+                        {steamError && (
+                          <span className="text-xs mt-0.5 block" style={{ color: "#ef4444" }}>
+                            Must start with steamcommunity.com
+                          </span>
+                        )}
                       </div>
                       {/* Website */}
                       <div className="relative">
