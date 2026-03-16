@@ -56,15 +56,23 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords }: AddPe
     setGeocoding(true);
     setGeocodeError("");
     try {
+      // Use structured params for better results, increase limit
+      const params = new URLSearchParams({
+        format: "json",
+        q: query,
+        limit: "8",
+        addressdetails: "1",
+        dedupe: "1",
+      });
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?${params}`,
         { headers: { "User-Agent": "BlackrockMaps/1.0" } }
       );
       const data: NominatimResult[] = await res.json();
       setSuggestions(data || []);
       setShowSuggestions(data.length > 0);
       if (data.length === 0 && query.trim().length > 5) {
-        setGeocodeError("No results found");
+        setGeocodeError("No results found - try a simpler address");
       }
     } catch {
       setGeocodeError("Search failed");
