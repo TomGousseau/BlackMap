@@ -1,7 +1,6 @@
 # Blackrock V2 — Maps App
 
-A premium dark-gold themed maps application with locations, businesses, and people. Built with Next.js 16, React 19, Leaflet, and MongoDB.
-
+A Alternative to google maps mixed apple map google maps and a other dark map to make the most personalisable maps include many thing in actual developement used CartoDB mainly for the maps.
 ---
 
 ## Stack
@@ -29,9 +28,6 @@ MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?appName=<appN
 # Admin credentials (used for login)
 ADMIN_USERNAME=your_admin_username
 ADMIN_PASSWORD=your_admin_password
-
-# JWT secret (optional - auto-generated if not set)
-# JWT_SECRET=your_jwt_secret_here
 ```
 
 ### How to get each value
