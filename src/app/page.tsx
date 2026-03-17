@@ -51,7 +51,18 @@ export default function HomePage() {
   const [editPersonData, setEditPersonData] = useState<PersonData | null>(null);
   const [editPersonStatus, setEditPersonStatus] = useState<'Updated' | 'Terminated' | 'Outdated' | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [userId, setUserId] = useState<string>("");
   const userSettings = useSettings();
+
+  // Initialize userId from localStorage
+  useEffect(() => {
+    let id = localStorage.getItem("blackrock_user_id");
+    if (!id) {
+      id = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      localStorage.setItem("blackrock_user_id", id);
+    }
+    setUserId(id);
+  }, []);
 
   // Lenis smooth scroll
   useEffect(() => {
@@ -215,10 +226,11 @@ export default function HomePage() {
   }, [businesses]);
 
   const handleSavePerson = useCallback((person: PersonData) => {
+    const personWithOwner = { ...person, ownerId: person.ownerId || userId };
     fetch("/api/persons", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(person),
+      body: JSON.stringify(personWithOwner),
     }).then(r => r.json()).then((saved) => {
       setPersons((prev) => [...prev, saved]);
       showStatus(isAdmin ? `"${person.name}" added!` : `"${person.name}" submitted for approval!`);
@@ -227,7 +239,7 @@ export default function HomePage() {
         setZoom(14);
       }
     }).catch(() => showStatus("Failed to save person"));
-  }, [showStatus, isAdmin]);
+  }, [showStatus, isAdmin, userId]);
 
   const handleApprovePerson = useCallback((personId: string) => {
     fetch(`/api/persons/${personId}`, {
@@ -454,7 +466,7 @@ export default function HomePage() {
       {/* Business profile button (top-right) */}
       <BusinessProfileButton
         businesses={businesses}
-        persons={isAdmin ? persons : persons.filter(p => p.approved)}
+        persons={persons.filter(p => p.ownerId === userId && (isAdmin || p.approved))}
         onAddBusiness={() => setShowAddBusiness(true)}
         onAddPerson={() => setShowAddPerson(true)}
         onSelectBusiness={(biz) => setSelectedBusiness(biz)}

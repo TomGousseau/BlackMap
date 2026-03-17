@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown, PenTool } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown, PenTool, Calendar, FileText, Star, Briefcase } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 import { getNationalitySuggestions } from "@/lib/flags";
@@ -853,17 +853,22 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Age <span className="text-[10px] font-normal">(optional)</span>
                     </label>
-                    <input
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                      placeholder="e.g. 25"
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "#a855f7", left: "16px", zIndex: 1 }} />
+                      <input
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                        placeholder="e.g. 25"
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* About */}
@@ -871,19 +876,24 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       About <span className="text-[10px] font-normal">(optional, max 200 chars)</span>
                     </label>
-                    <textarea
-                      value={about}
-                      onChange={(e) => setAbout(e.target.value.slice(0, 200))}
-                      placeholder="Brief bio..."
-                      rows={2}
-                      maxLength={200}
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none resize-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <FileText size={16} className="absolute top-3 pointer-events-none"
+                        style={{ color: "#3b82f6", left: "16px", zIndex: 1 }} />
+                      <textarea
+                        value={about}
+                        onChange={(e) => setAbout(e.target.value.slice(0, 200))}
+                        placeholder="Brief bio..."
+                        rows={2}
+                        maxLength={200}
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none resize-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
                     <div className="text-[10px] mt-1 text-right" style={{ color: about.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
                       {about.length}/200
                     </div>
@@ -894,18 +904,23 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Reason <span className="text-[10px] font-normal">(why they're notable, max 200 chars)</span>
                     </label>
-                    <input
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value.slice(0, 200))}
-                      placeholder="e.g. Founded a tech company"
-                      maxLength={200}
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <MessageCircle size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "#22c55e", left: "16px", zIndex: 1 }} />
+                      <input
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value.slice(0, 200))}
+                        placeholder="e.g. Founded a tech company"
+                        maxLength={200}
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
                     <div className="text-[10px] mt-1 text-right" style={{ color: reason.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
                       {reason.length}/200
                     </div>
@@ -916,18 +931,23 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Notable Action <span className="text-[10px] font-normal">(optional, max 200 chars)</span>
                     </label>
-                    <input
-                      value={notableAction}
-                      onChange={(e) => setNotableAction(e.target.value.slice(0, 200))}
-                      placeholder="e.g. Invented the smartphone"
-                      maxLength={200}
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <Star size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "#eab308", left: "16px", zIndex: 1 }} />
+                      <input
+                        value={notableAction}
+                        onChange={(e) => setNotableAction(e.target.value.slice(0, 200))}
+                        placeholder="e.g. Invented the smartphone"
+                        maxLength={200}
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
                     <div className="text-[10px] mt-1 text-right" style={{ color: notableAction.length >= 180 ? "#ff6961" : "var(--color-text-secondary)" }}>
                       {notableAction.length}/200
                     </div>
@@ -938,17 +958,22 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
                       Worked For <span className="text-[10px] font-normal">(optional)</span>
                     </label>
-                    <input
-                      value={workedFor}
-                      onChange={(e) => setWorkedFor(e.target.value)}
-                      placeholder="e.g. Apple, Google, Tesla"
-                      className="w-full px-4 py-3 rounded-2xl text-sm outline-none"
-                      style={{
-                        background: "var(--color-surface)",
-                        color: "var(--color-text)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    />
+                    <div className="relative">
+                      <Briefcase size={16} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: "#f97316", left: "16px", zIndex: 1 }} />
+                      <input
+                        value={workedFor}
+                        onChange={(e) => setWorkedFor(e.target.value)}
+                        placeholder="e.g. Apple, Google, Tesla"
+                        className="w-full py-3 pr-4 rounded-2xl text-sm outline-none"
+                        style={{
+                          background: "var(--color-surface)",
+                          color: "var(--color-text)",
+                          border: "1px solid var(--color-border)",
+                          paddingLeft: "52px",
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Relations / Connections */}
