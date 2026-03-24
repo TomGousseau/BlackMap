@@ -6,17 +6,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const review = await req.json();
   const db = await getDatabase();
 
-  // Push review and recalculate reputation
-  const biz = await db.collection("businesses").findOne({ id });
-  if (!biz) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  const newReviews = [...(biz.reviews || []), review];
-  const avgRep = newReviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / newReviews.length;
-
-  await db.collection("businesses").updateOne(
+  // Use an aggregation pipeline update to push the review and recalculate the
+  // average reputation atomically in a single round-trip instead of findOne + updateOne.
+  const result = await db.collection("businesses").updateOne(
     { id },
-    { $set: { reviews: newReviews, reputation: Math.round(avgRep * 10) / 10 } }
+    [
+      { $set: { reviews: { $concatArrays: [{ $ifNull: ["$reviews", []] }, [review]] } } },
+      { $set: { reputation: { $round: [{ $avg: "$reviews.rating" }, 1] } } },
+    ]
   );
+
+  if (result.matchedCount === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ success: true }, { status: 201 });
 }

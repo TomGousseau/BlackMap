@@ -25,11 +25,13 @@ export function PlaceDetail({ location, onClose, onAddReview, onSave, onShare, o
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Get all images (combine imageUrl and imageUrls for backward compatibility)
-  const allImages = location ? [
-    ...(location.imageUrl ? [location.imageUrl] : []),
-    ...(location.imageUrls || []),
-  ].filter((url, index, arr) => arr.indexOf(url) === index) : []; // Remove duplicates
-
+  // Use Set for O(n) deduplication instead of O(n²) indexOf
+  const allImages = location
+    ? [...new Set([
+        ...(location.imageUrl ? [location.imageUrl] : []),
+        ...(location.imageUrls || []),
+      ])]
+    : [];
   // Reset image index when location changes
   useEffect(() => {
     setCurrentImageIndex(0);

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, MapPin } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import type { LocationData, PersonData } from "@/lib/types";
 import { User } from "lucide-react";
 
@@ -61,21 +61,48 @@ export function SearchBar({ locations, persons = [], popularSearches, onSelect, 
   const containerRef = useRef<HTMLDivElement>(null);
   const typingText = useTypingAnimation(PLACEHOLDER_PHRASES);
 
-  const filtered = query.trim()
-    ? locations.filter(
-        (l) =>
-          l.name.toLowerCase().includes(query.toLowerCase()) ||
-          l.category?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 5)
-    : [];
+  // Memoize the normalised query to avoid repeated toLowerCase() calls
+  const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
 
-  const filteredPersons = query.trim()
-    ? persons.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()) ||
-          p.about?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 3)
-    : [];
+  // Pre-compute lowercase searchable fields so they are computed once per data
+  // change rather than on every render during filtering.
+  const locationsLower = useMemo(
+    () => locations.map((l) => ({ loc: l, name: l.name.toLowerCase(), category: l.category?.toLowerCase() ?? "" })),
+    [locations]
+  );
+
+  const personsLower = useMemo(
+    () => persons.map((p) => ({ person: p, name: p.name.toLowerCase(), about: p.about?.toLowerCase() ?? "" })),
+    [persons]
+  );
+
+  const filtered = useMemo(
+    () =>
+      normalizedQuery
+        ? locationsLower
+            .filter(({ name, category }) => name.includes(normalizedQuery) || category.includes(normalizedQuery))
+            .map(({ loc }) => loc)
+            .slice(0, 5)
+        : [],
+    [locationsLower, normalizedQuery]
+  );
+
+  const filteredPersons = useMemo(
+    () =>
+      normalizedQuery
+        ? personsLower
+            .filter(({ name, about }) => name.includes(normalizedQuery) || about.includes(normalizedQuery))
+            .map(({ person }) => person)
+            .slice(0, 3)
+        : [],
+    [personsLower, normalizedQuery]
+  );
+
+  // Memoize sorted recent places to avoid re-sorting on every render
+  const recentPlaces = useMemo(
+    () => [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4),
+    [locations]
+  );
 
   // Simulate brief search animation when query changes
   useEffect(() => {
@@ -88,7 +115,6 @@ export function SearchBar({ locations, persons = [], popularSearches, onSelect, 
   }, [query]);
 
   const showDropdown = focused && (query.trim() === "" || filtered.length > 0 || filteredPersons.length > 0);
-  const recentPlaces = [...locations].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

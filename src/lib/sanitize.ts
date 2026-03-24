@@ -24,6 +24,17 @@ export function escapeMarkdown(text: string): string {
     .replace(/\|/g, '\\|');  // Pipe (tables)
 }
 
+// Escape HTML special characters to prevent XSS when inserting into HTML contexts
+export function escapeHtml(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 // For display: just show the text as-is, preventing any interpretation
 // This is simpler - just return plain text without HTML/markdown interpretation
 export function sanitizeForDisplay(text: string): string {

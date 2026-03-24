@@ -31,5 +31,28 @@ export default clientPromise;
 
 export async function getDatabase(): Promise<Db> {
   const client = await clientPromise;
-  return client.db("blackrock");
+  const db = client.db("blackrock");
+  await ensureIndexes(db);
+  return db;
+}
+
+// Track whether indexes have been created to avoid re-running on every request
+const globalWithIndexes = globalThis as typeof globalThis & { _indexesCreated?: boolean };
+
+async function ensureIndexes(db: Db): Promise<void> {
+  if (globalWithIndexes._indexesCreated) return;
+  globalWithIndexes._indexesCreated = true;
+
+  // createIndex is idempotent in MongoDB — safe to call even if index already exists
+  await Promise.all([
+    db.collection("persons").createIndex({ id: 1 }, { unique: true, sparse: true }),
+    db.collection("persons").createIndex({ approved: 1 }),
+    db.collection("businesses").createIndex({ id: 1 }, { unique: true, sparse: true }),
+    db.collection("businesses").createIndex({ approved: 1 }),
+    db.collection("locations").createIndex({ id: 1 }, { unique: true, sparse: true }),
+    db.collection("locations").createIndex({ approved: 1 }),
+  ]).catch(() => {
+    // Non-fatal: index creation failures should not break requests
+    globalWithIndexes._indexesCreated = false;
+  });
 }

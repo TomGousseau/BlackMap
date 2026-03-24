@@ -36,6 +36,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 // PUT - Full person update (for editing)
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await isAuthenticated();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const { id } = await params;
   const body = await req.json();
   const db = await getDatabase();

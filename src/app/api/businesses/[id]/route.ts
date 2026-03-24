@@ -10,15 +10,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json();
   const db = await getDatabase();
 
-  await db.collection("businesses").updateOne(
-    { _id: id as unknown as import("mongodb").ObjectId },
-    { $set: body }
-  );
+  // Whitelist allowed fields to prevent overwriting sensitive data
+  const allowedFields: Record<string, unknown> = {};
+  if (typeof body.approved === "boolean") allowedFields.approved = body.approved;
+  if (typeof body.important === "boolean") allowedFields.important = body.important;
+  if (typeof body.verified === "boolean") allowedFields.verified = body.verified;
 
-  // Also try string id match
+  if (Object.keys(allowedFields).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+  }
+
   await db.collection("businesses").updateOne(
     { id },
-    { $set: body }
+    { $set: allowedFields }
   );
 
   return NextResponse.json({ success: true });
