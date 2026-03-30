@@ -81,4 +81,5 @@ export interface PersonData {
   status?: 'Updated' | 'Terminated' | 'Outdated'; // Page status set by owner during modification
   ownerId?: string; // Owner can modify their own person page
   signature?: string; // Creator signature (max 20 chars)
+  customFields?: { label: string; value: string }[]; // Up to 5 custom fields (e.g., IBAN, etc.)
 }

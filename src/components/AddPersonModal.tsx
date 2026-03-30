@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown, PenTool, Calendar, FileText, Star, Briefcase } from "lucide-react";
+import { X, MapPin, User, ImagePlus, MapPinned, Navigation, Loader2, Plus, Trash2, MessageCircle, Youtube, Phone, Hash, Send, Globe, Gamepad2, Github, Flag, Users, ChevronDown, PenTool, Calendar, FileText, Star, Briefcase, Tag } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { PersonData } from "@/lib/types";
 import { getNationalitySuggestions } from "@/lib/flags";
@@ -52,6 +52,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
   const [age, setAge] = useState("");
   const [showSocialLinks, setShowSocialLinks] = useState(false);
   const [signature, setSignature] = useState("");
+  const [customFields, setCustomFields] = useState<{ label: string; value: string }[]>([]);
 
   // URL Validation functions
   const isValidUrl = (url: string, domain: string): boolean => {
@@ -98,6 +99,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
       setRelations(personToEdit.relations || []);
       setAge(personToEdit.age || "");
       setSignature(personToEdit.signature || "");
+      setCustomFields(personToEdit.customFields || []);
       setManualLat(personToEdit.lat?.toString() || "");
       setManualLng(personToEdit.lng?.toString() || "");
       setLocationMode("coords");
@@ -237,6 +239,9 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
       relations: relations.length > 0 ? relations : undefined,
       age: age.trim() || undefined,
       signature: signature.trim() || undefined,
+      customFields: customFields.filter(f => f.label.trim() && f.value.trim()).length > 0 
+        ? customFields.filter(f => f.label.trim() && f.value.trim()) 
+        : undefined,
       createdAt: editMode && personToEdit ? personToEdit.createdAt : new Date().toISOString(),
       ownerId: editMode && personToEdit ? personToEdit.ownerId : undefined,
       status: editMode ? selectedStatus : undefined,
@@ -247,7 +252,7 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
     setReason(""); setNotableAction(""); setWorkedFor("");
     setDiscord(""); setYoutube(""); setDiscordId(""); setPhone(""); setTelegram(""); setTelegramId("");
     setVk(""); setGithub(""); setSteam(""); setWebsite(""); setNationality("");
-    setRelations([]); setNewRelationName(""); setNewRelationImage(""); setAge(""); setSignature(""); setShowSocialLinks(false); setShowAddRelation(false);
+    setRelations([]); setNewRelationName(""); setNewRelationImage(""); setAge(""); setSignature(""); setCustomFields([]); setShowSocialLinks(false); setShowAddRelation(false);
     setLocationAddress(""); setManualLat(""); setManualLng("");
     setGeocodedCoords(null); setLocationMode("address"); setGeocodeError("");
     setSuggestions([]); setShowSuggestions(false);
@@ -1127,6 +1132,85 @@ export function AddPersonModal({ isOpen, onClose, onSave, pendingCoords, editMod
                     <div className="text-[10px] mt-1 text-right" style={{ color: signature.length >= 18 ? "#ff6961" : "var(--color-text-secondary)" }}>
                       {signature.length}/20
                     </div>
+                  </div>
+
+                  {/* Custom Fields */}
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--color-text-secondary)" }}>
+                      Custom Fields <span className="text-[10px] font-normal">(up to 5, e.g. IBAN, ID...)</span>
+                    </label>
+                    
+                    {/* Existing custom fields */}
+                    {customFields.length > 0 && (
+                      <div className="space-y-2 mb-3">
+                        {customFields.map((field, idx) => (
+                          <div key={idx} className="flex gap-2 items-center">
+                            <div className="relative flex-1 min-w-0">
+                              <Tag size={14} className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                                style={{ color: "#ec4899", left: "12px", zIndex: 1 }} />
+                              <input
+                                value={field.label}
+                                onChange={(e) => {
+                                  const newFields = [...customFields];
+                                  newFields[idx].label = e.target.value;
+                                  setCustomFields(newFields);
+                                }}
+                                placeholder="Label (e.g. IBAN)"
+                                className="w-full py-2.5 pr-2 rounded-xl text-sm outline-none"
+                                style={{
+                                  background: "var(--color-surface)",
+                                  color: "var(--color-text)",
+                                  border: "1px solid var(--color-border)",
+                                  paddingLeft: "38px",
+                                }}
+                              />
+                            </div>
+                            <div className="relative flex-[2] min-w-0">
+                              <input
+                                value={field.value}
+                                onChange={(e) => {
+                                  const newFields = [...customFields];
+                                  newFields[idx].value = e.target.value;
+                                  setCustomFields(newFields);
+                                }}
+                                placeholder="Value"
+                                className="w-full py-2.5 px-3 rounded-xl text-sm outline-none"
+                                style={{
+                                  background: "var(--color-surface)",
+                                  color: "var(--color-text)",
+                                  border: "1px solid var(--color-border)",
+                                }}
+                              />
+                            </div>
+                            <motion.button
+                              type="button"
+                              onClick={() => setCustomFields(customFields.filter((_, i) => i !== idx))}
+                              className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
+                              style={{ background: "var(--color-surface)" }}
+                              whileHover={{ scale: 1.05, background: "#ff3b30" }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Trash2 size={14} style={{ color: "var(--color-text-secondary)" }} />
+                            </motion.button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add custom field button */}
+                    {customFields.length < 5 && (
+                      <motion.button
+                        type="button"
+                        onClick={() => setCustomFields([...customFields, { label: "", value: "" }])}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer"
+                        style={{ background: "var(--color-surface)", color: "#ec4899" }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Plus size={12} />
+                        Add custom field ({customFields.length}/5)
+                      </motion.button>
+                    )}
                   </div>
 
                   {/* Save button */}

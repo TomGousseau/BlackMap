@@ -607,6 +607,24 @@ export function PersonDetailPanel({ person, onClose, onAddReview, onSetRating, o
                 </>
               )}
 
+              {/* Custom Fields */}
+              {location.customFields && location.customFields.length > 0 && (
+                <>
+                  <div className="h-[1px] mx-6" style={{ background: "#2a2a2e" }} />
+                  <div className="px-6 py-5">
+                    <h3 className="text-[12px] font-semibold tracking-wider mb-4" style={{ color: "#8e8e93" }}>CUSTOM INFO</h3>
+                    <div className="space-y-3">
+                      {location.customFields.map((field, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-3">
+                          <span className="text-[12px] font-semibold" style={{ color: "#ec4899" }}>{field.label}</span>
+                          <span className="text-[14px] text-right" style={{ color: "#c7c7cc" }}>{field.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
               {/* Divider */}
               <div className="h-[1px] mx-6 mt-8 mb-8" style={{ background: "#2a2a2e" }} />
 
